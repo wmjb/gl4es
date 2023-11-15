@@ -265,6 +265,10 @@ typedef struct {
 KHASH_MAP_INIT_INT(mapdrawable, map_drawable_t*)
 khash_t(mapdrawable) *MapDrawable = NULL;
 
+#ifdef TEGRA
+define NOX11=0
+#endif
+
 #ifndef NOX11
 static int get_config_default(Display *display, int attribute, int *value) {
     switch (attribute) {
