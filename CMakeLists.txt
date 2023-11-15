@@ -73,6 +73,7 @@ endif(STATICLIB)
 # TEGRA
 if(TEGRA)
     add_definitions(-DTEGRA -DNOX11=0 -DNOEGL=0 -DDEFAULT_ES=2 -DGLX_STUBS)
+    set(EGL_WRAPPER ON)
 endif()
 
 # Pyra
