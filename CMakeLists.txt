@@ -73,6 +73,8 @@ endif(STATICLIB)
 # TEGRA
 if(TEGRA)
     add_definitions(-DTEGRA)
+    set(NOX11 OFF)
+    set(NOEGL OFF)
 endif()
 
 # Pyra
