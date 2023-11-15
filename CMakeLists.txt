@@ -70,6 +70,11 @@ if(STATICLIB)
     add_definitions(-DSTATICLIB)
 endif(STATICLIB)
 
+# TEGRA
+if(TEGRA)
+    add_definitions(-DTEGRA)
+endif()
+
 # Pyra
 if(PYRA)
     add_definitions(-DPYRA)
