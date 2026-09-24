@@ -20,6 +20,7 @@ SET(GL_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/envvars.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/eval.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/face.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/gl/fence.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/fog.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/fpe.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/fpe_cache.c
@@ -41,6 +42,7 @@ SET(GL_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/matrix.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/matvec.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/oldprogram.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/gl/occlusion.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/pixel.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/planes.c
     ${CMAKE_CURRENT_SOURCE_DIR}/gl/pointsprite.c

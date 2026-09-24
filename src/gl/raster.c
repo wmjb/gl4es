@@ -64,8 +64,9 @@ void APIENTRY_GL4ES gl4es_glWindowPos3f(GLfloat x, GLfloat y, GLfloat z) {
 }
 
 void APIENTRY_GL4ES gl4es_glViewport(GLint x, GLint y, GLsizei width, GLsizei height) {
-	if (glstate->fbo.current_fb->id != 0) {
-    	gltexture_t *tex = gl4es_getTexture(glstate->fbo.current_fb->t_color[0], glstate->fbo.current_fb->color[0]);
+//	if (glstate->fbo.current_fb->id != 0) {
+	if (glstate->fbo.current_fb && glstate->fbo.current_fb->id != 0) {
+  	gltexture_t *tex = gl4es_getTexture(glstate->fbo.current_fb->t_color[0], glstate->fbo.current_fb->color[0]);
 		if (tex->fbtex_ratio > 0.0f) {
 			width *= tex->fbtex_ratio;
 			height *= tex->fbtex_ratio;
@@ -92,7 +93,9 @@ void APIENTRY_GL4ES gl4es_glViewport(GLint x, GLint y, GLsizei width, GLsizei he
 		  glstate->raster.viewport.height = height;
     }
 #if !defined(NO_EGL) && !defined(NOX11)
-		if(!globals4es.usefbo && !globals4es.usefb && glstate->fbo.fbo_draw->id==0) {
+//		if(!globals4es.usefbo && !globals4es.usefb && glstate->fbo.fbo_draw->id==0) {
+
+		if(!globals4es.usefbo && !globals4es.usefb && glstate->fbo.fbo_draw && glstate->fbo.fbo_draw->id==0) {
 			// check if underlying EGL surface change dimension, and reflect that to main fbo size
 			refreshMainFBO();
 		}

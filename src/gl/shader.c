@@ -132,6 +132,7 @@ void APIENTRY_GL4ES gl4es_glCompileShader(GLuint shader) {
             GLint status = 0;
             gles_glGetShaderiv(glshader->id, GL_COMPILE_STATUS, &status);
             if(status!=GL_TRUE) {
+
                 printf("LIBGL: Error while compiling shader %d. Original source is:\n%s\n=======\n", glshader->id, glshader->source);
                 printf("ShaderConv Source is:\n%s\n=======\n", glshader->converted);
                 char tmp[500];
@@ -177,6 +178,18 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
         else
             glshader->converted = ConvertShader(glshader->source, glshader->type==GL_VERTEX_SHADER?1:0, &glshader->need);
         // send source to GLES2 hardware if any
+
+
+// send source to GLES2 hardware if any
+/*        const char *final_source = glshader->converted ? glshader->converted : glshader->source;
+
+        printf("\n========== [GL4ES] SENDING SHADER TO GPU (ID: %d, Type: %s) ==========\n", 
+               shader, PrintEnum(glshader->type));
+        printf("%s\n", final_source ? final_source : "<NULL>");
+        printf("========================================================================\n\n");
+
+        gles_glShaderSource(shader, 1, (const GLchar * const*)&final_source, NULL);
+*/
         gles_glShaderSource(shader, 1, (const GLchar * const*)((glshader->converted)?(&glshader->converted):(&glshader->source)), NULL);
         errorGL();
     } else

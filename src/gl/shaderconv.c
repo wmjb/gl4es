@@ -20,7 +20,7 @@ typedef struct {
 
 const builtin_attrib_t builtin_attrib[] = {
     {"gl_Vertex", "_gl4es_Vertex", "vec4", "highp", ARB_VERTEX},
-    {"gl_Color", "_gl4es_Color", "vec4", "lowp", ARB_COLOR},
+    {"gl_Color", "_gl4es_Color", "vec4", "highp", ARB_COLOR},
     {"gl_MultiTexCoord0", "_gl4es_MultiTexCoord0", "vec4", "highp", ARB_MULTITEXCOORD0},
     {"gl_MultiTexCoord1", "_gl4es_MultiTexCoord1", "vec4", "highp", ARB_MULTITEXCOORD1},
     {"gl_MultiTexCoord2", "_gl4es_MultiTexCoord2", "vec4", "highp", ARB_MULTITEXCOORD2},
@@ -37,14 +37,14 @@ const builtin_attrib_t builtin_attrib[] = {
     {"gl_MultiTexCoord13", "_gl4es_MultiTexCoord13", "vec4", "highp", ARB_MULTITEXCOORD13},
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", ARB_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", ARB_MULTITEXCOORD15},
-    {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "lowp", ARB_SECONDARY},
+    {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", ARB_SECONDARY},
     {"gl_Normal", "_gl4es_Normal", "vec3", "highp", ARB_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", ARB_FOGCOORD}
 };
 
 const builtin_attrib_t builtin_attrib_compressed[] = {
     {"gl_Vertex", "_gl4es_Vertex", "vec4", "highp", COMP_VERTEX},
-    {"gl_Color", "_gl4es_Color", "vec4", "lowp", COMP_COLOR},
+    {"gl_Color", "_gl4es_Color", "vec4", "highp", COMP_COLOR},
     {"gl_MultiTexCoord0", "_gl4es_MultiTexCoord0", "vec4", "highp", COMP_MULTITEXCOORD0},
     {"gl_MultiTexCoord1", "_gl4es_MultiTexCoord1", "vec4", "highp", COMP_MULTITEXCOORD1},
     {"gl_MultiTexCoord2", "_gl4es_MultiTexCoord2", "vec4", "highp", COMP_MULTITEXCOORD2},
@@ -61,7 +61,7 @@ const builtin_attrib_t builtin_attrib_compressed[] = {
     {"gl_MultiTexCoord13", "_gl4es_MultiTexCoord13", "vec4", "highp", COMP_MULTITEXCOORD13},
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", COMP_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", COMP_MULTITEXCOORD15},
-    {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "lowp", COMP_SECONDARY},
+    {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", COMP_SECONDARY},
     {"gl_Normal", "_gl4es_Normal", "vec3", "highp", COMP_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", COMP_FOGCOORD}
 };
@@ -125,14 +125,14 @@ static const char* gl4es_MaxTextureCoordsSource =
 #undef STR
 #undef STR_HELPER
 
-static const char* gl4es_LightSourceParametersSource = 
-"struct gl_LightSourceParameters\n"
+static const char* gl4es_LightSourceParametersSource =
+"struct gl4es_LightSourceParameters\n"
 "{\n"
 "   vec4 ambient;\n"
 "   vec4 diffuse;\n"
 "   vec4 specular;\n"
 "   vec4 position;\n"
-"   vec4 halfVector;\n"   //halfVector = normalize(normalize(position) + vec3(0,0,1) if vbs==FALSE)
+"   vec4 halfVector;\n"
 "   vec3 spotDirection;\n"
 "   float spotExponent;\n"
 "   float spotCutoff;\n"
@@ -141,16 +141,16 @@ static const char* gl4es_LightSourceParametersSource =
 "   float linearAttenuation;\n"
 "   float quadraticAttenuation;\n"
 "};\n"
-"uniform gl_LightSourceParameters gl_LightSource[gl_MaxLights];\n";
+"uniform gl4es_LightSourceParameters _gl4es_LightSource[8];\n";
 
 static const char* gl4es_LightModelParametersSource =
-"struct gl_LightModelParameters {\n"
+"struct gl4es_LightModelParameters {\n"
 "  vec4 ambient;\n"
 "};\n"
-"uniform gl_LightModelParameters gl_LightModel;\n";
+"uniform gl4es_LightModelParameters _gl4es_LightModel;\n";
 
 static const char* gl4es_MaterialParametersSource =
-"struct gl_MaterialParameters\n"
+"struct gl4es_MaterialParameters\n"
 "{\n"
 "   vec4 emission;\n"
 "   vec4 ambient;\n"
@@ -158,29 +158,31 @@ static const char* gl4es_MaterialParametersSource =
 "   vec4 specular;\n"
 "   float shininess;\n"
 "};\n"
-"uniform gl_MaterialParameters gl_FrontMaterial;\n"
-"uniform gl_MaterialParameters gl_BackMaterial;\n";
+"uniform gl4es_MaterialParameters _gl4es_FrontMaterial;\n"
+"uniform gl4es_MaterialParameters _gl4es_BackMaterial;\n";
 
 static const char* gl4es_LightModelProductsSource =
-"struct gl_LightModelProducts\n"
+"struct gl4es_LightModelProducts\n"
 "{\n"
 "   vec4 sceneColor;\n"
 "};\n"
-"uniform gl_LightModelProducts gl_FrontLightModelProduct;\n"
-"uniform gl_LightModelProducts gl_BackLightModelProduct;\n";
+"uniform gl4es_LightModelProducts _gl4es_FrontLightModelProduct;\n"
+"uniform gl4es_LightModelProducts _gl4es_BackLightModelProduct;\n";
 
 static const char* gl4es_LightProductsSource =
-"struct gl_LightProducts\n"
+"#define _gl4es_MaxLights 8\n"
+"struct gl4es_LightProducts\n"
 "{\n"
 "   vec4 ambient;\n"
 "   vec4 diffuse;\n"
 "   vec4 specular;\n"
 "};\n"
-"uniform gl_LightProducts gl_FrontLightProduct[gl_MaxLights];\n"
-"uniform gl_LightProducts gl_BackLightProduct[gl_MaxLights];\n";
+"uniform gl4es_LightProducts _gl4es_FrontLightProduct[_gl4es_MaxLights];\n"
+"uniform gl4es_LightProducts _gl4es_BackLightProduct[_gl4es_MaxLights];\n";
+
 
 static const char* gl4es_PointSpriteSource =
-"struct gl_PointParameters\n"
+"struct gl4es_PointParameters\n"
 "{\n"
 "   float size;\n"
 "   float sizeMin;\n"
@@ -190,63 +192,68 @@ static const char* gl4es_PointSpriteSource =
 "   float distanceLinearAttenuation;\n"
 "   float distanceQuadraticAttenuation;\n"
 "};\n"
-"uniform gl_PointParameters gl_Point;\n";
+"uniform gl4es_PointParameters _gl4es_Point;\n";
 
 static const char* gl4es_FogParametersSource =
-"struct gl_FogParameters {\n"
-"    lowp vec4 color;\n"
-"    mediump float density;\n"
-"    mediump float start;\n"
-"    mediump float end;\n"
-"    mediump float scale;\n"   // Derived:   1.0 / (end - start) 
+"struct gl4es_FogParameters {\n"
+"   highp vec4 color;\n"
+"   highp float density;\n"
+"   highp float start;\n"
+"   highp float end;\n"
+"   highp float scale;\n"   // Derived:   1.0 / (end - start)
 "};\n"
-"uniform gl_FogParameters gl_Fog;\n";
+"uniform gl4es_FogParameters _gl4es_Fog;\n";
+
 static const char* gl4es_FogParametersSourceHighp =
-"struct gl_FogParameters {\n"
-"    lowp vec4 color;\n"
-"    mediump float density;\n"
-"    highp   float start;\n"
-"    highp   float end;\n"
-"    highp   float scale;\n"   // Derived:   1.0 / (end - start) 
+"struct gl4es_FogParameters {\n"
+"   highp vec4 color;\n"
+"   highp float density;\n"
+"   highp   float start;\n"
+"   highp   float end;\n"
+"   highp   float scale;\n"   // Derived:   1.0 / (end - start)
 "};\n"
-"uniform gl_FogParameters gl_Fog;\n";
+"uniform gl4es_FogParameters _gl4es_Fog;\n";
 
 static const char* gl4es_texenvcolorSource =
-"uniform vec4 gl_TextureEnvColor[gl_MaxTextureUnits];\n";
+"#define _gl4es_MaxTextureUnits 4\n"
+"uniform vec4 _gl4es_TextureEnvColor[_gl4es_MaxTextureUnits];\n";
 
 static const char* gl4es_texgeneyeSource[4] = {
-"uniform vec4 gl_EyePlaneS[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_EyePlaneT[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_EyePlaneR[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_EyePlaneQ[gl_MaxTextureCoords];\n" };
+"#define _gl4es_MaxTextureCoords 8\n"
+"uniform vec4 _gl4es_EyePlaneS[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_EyePlaneT[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_EyePlaneR[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_EyePlaneQ[_gl4es_MaxTextureCoords];\n" };
 
 static const char* gl4es_texgenobjSource[4] = {
-"uniform vec4 gl_ObjectPlaneS[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_ObjectPlaneT[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_ObjectPlaneR[gl_MaxTextureCoords];\n",
-"uniform vec4 gl_ObjectPlaneQ[gl_MaxTextureCoords];\n" };
+"#define _gl4es_MaxTextureCoords 8\n"
+"uniform vec4 _gl4es_ObjectPlaneS[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_ObjectPlaneT[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_ObjectPlaneR[_gl4es_MaxTextureCoords];\n",
+"uniform vec4 _gl4es_ObjectPlaneQ[_gl4es_MaxTextureCoords];\n" };
 
-static const char* gl4es_clipplanesSource = 
-"uniform vec4  gl_ClipPlane[gl_MaxClipPlanes];\n";
+static const char* gl4es_clipplanesSource =
+"#define _gl4es_MaxClipPlanes 6\n"
+"uniform vec4 _gl4es_ClipPlane[_gl4es_MaxClipPlanes];\n";
 
 static const char* gl4es_normalscaleSource =
-"uniform float gl_NormalScale;\n";
+"uniform float _gl4es_NormalScale;\n";
 
 static const char* gl4es_instanceID =
 "#define GL_ARB_draw_instanced 1\n"
 "uniform int _gl4es_InstanceID;\n";
 
 static const char* gl4es_frontColorSource =
-"varying lowp vec4 _gl4es_FrontColor;\n";
+"varying highp vec4 _gl4es_FrontColor;\n";
 
 static const char* gl4es_backColorSource =
-"varying lowp vec4 _gl4es_BackColor;\n";
+"varying highp vec4 _gl4es_BackColor;\n";
 
 static const char* gl4es_frontSecondaryColorSource =
-"varying lowp vec4 _gl4es_FrontSecondaryColor;\n";
+"varying highp vec4 _gl4es_FrontSecondaryColor;\n";
 
 static const char* gl4es_backSecondaryColorSource =
-"varying lowp vec4 _gl4es_BackSecondaryColor;\n";
+"varying highp vec4 _gl4es_BackSecondaryColor;\n";
 
 static const char* gl4es_texcoordSource =
 "varying highp vec4 _gl4es_TexCoord[%d];\n";
@@ -255,31 +262,31 @@ static const char* gl4es_texcoordSourceAlt =
 "varying highp vec4 _gl4es_TexCoord_%d;\n";
 
 static const char* gl4es_fogcoordSource =
-"varying mediump float _gl4es_FogFragCoord;\n";
+"varying highp float _gl4es_FogFragCoord;\n";
 
-static const char* gl4es_ftransformSource = 
+static const char* gl4es_ftransformSource =
 "\n"
 "highp vec4 ftransform() {\n"
-" return gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+" return _gl4es_ModelViewProjectionMatrix * _gl4es_Vertex;\n"
 "}\n";
 
-static const char* gl4es_ClipVertex = 
+static const char* gl4es_ClipVertex =
 "vec4 gl4es_ClipVertex;\n";
 
-static const char* gl4es_ClipVertexSource = 
+static const char* gl4es_ClipVertexSource =
 "gl4es_ClipVertex";
 
 static const char* gl4es_ClipVertex_clip =
 "\nif(any(lessThanEqual(gl4es_ClipVertex.xyz, vec3(-gl4es_ClipVertex.w)))"
 " || any(greaterThanEqual(gl4es_ClipVertex.xyz, vec3(gl4es_ClipVertex.w)))) discard;\n";
 
-static const char* gl_TexCoordSource = "gl_TexCoord[";
+static const char* gl_TexCoordSource = "gl_TexCoord["; //_gl4es_TexCoord[ check this
 
 static const char* gl_TexMatrixSources[] = {
-"gl_TextureMatrixInverseTranspose[",
-"gl_TextureMatrixInverse[",
-"gl_TextureMatrixTranspose[",
-"gl_TextureMatrix["
+"gl4es_TextureMatrixInverseTranspose[",
+"gl4es_TextureMatrixInverse[",
+"gl4es_TextureMatrixTranspose[",
+"gl4es_TextureMatrix["
 };
 
 static const char* GLESHeader[] = {
@@ -306,76 +313,11 @@ static const char* gl4es_transpose =
 "             m[0][3], m[1][3], m[2][3], m[3][3]);\n"
 "}\n";
 
-static const char* HackAltPow = 
-"float pow(float f, int a) {\n"
-" return pow(f, float(a));\n"
-"}\n";
-static const char* HackAltMax = 
-"float max(float a, int b) {\n"
-" return max(a, float(b));\n"
-"}\n"
-"float max(int a, float b) {\n"
-" return max(float(a), b);\n"
-"}\n";
-static const char* HackAltMin = 
-"float min(float a, int b) {\n"
-" return min(a, float(b));\n"
-"}\n"
-"float min(int a, float b) {\n"
-" return min(float(a), b);\n"
-"}\n";
-static const char* HackAltClamp = 
-"float clamp(float f, int a, int b) {\n"
-" return clamp(f, float(a), float(b));\n"
-"}\n"
-"float clamp(float f, float a, int b) {\n"
-" return clamp(f, a, float(b));\n"
-"}\n"
-"float clamp(float f, int a, float b) {\n"
-" return clamp(f, float(a), b);\n"
-"}\n"
-"vec2 clamp(vec2 f, int a, int b) {\n"
-" return clamp(f, float(a), float(b));\n"
-"}\n"
-"vec2 clamp(vec2 f, float a, int b) {\n"
-" return clamp(f, a, float(b));\n"
-"}\n"
-"vec2 clamp(vec2 f, int a, float b) {\n"
-" return clamp(f, float(a), b);\n"
-"}\n"
-"vec3 clamp(vec3 f, int a, int b) {\n"
-" return clamp(f, float(a), float(b));\n"
-"}\n"
-"vec3 clamp(vec3 f, float a, int b) {\n"
-" return clamp(f, a, float(b));\n"
-"}\n"
-"vec3 clamp(vec3 f, int a, float b) {\n"
-" return clamp(f, float(a), b);\n"
-"}\n"
-"vec4 clamp(vec4 f, int a, int b) {\n"
-" return clamp(f, float(a), float(b));\n"
-"}\n"
-"vec4 clamp(vec4 f, float a, int b) {\n"
-" return clamp(f, a, float(b));\n"
-"}\n"
-"vec4 clamp(vec4 f, int a, float b) {\n"
-" return clamp(f, float(a), b);\n"
-"}\n";
-
-
-static const char* HackAltMod = 
-"float mod(float f, int a) {\n"
-" return mod(f, float(a));\n"
-"}\n"
-"vec2 mod(vec2 f, int a) {\n"
-" return mod(f, float(a));\n"
-"}\n"
-"vec3 mod(vec3 f, int a) {\n"
-" return mod(f, float(a));\n"
-"}\n"
-"vec4 mod(vec4 f, int a) {\n"
-" return mod(f, float(a));\n"
-"}\n";
+static const char* HackAltPow = "";
+static const char* HackAltMax = "";
+static const char* HackAltMin = "";
+static const char* HackAltClamp = "";
+static const char* HackAltMod = "";
 
 static const char* texture2DLodAlt =
 "vec4 _gl4es_texture2DLod(sampler2D sampler, vec2 coord, float lod) {\n"
@@ -434,8 +376,25 @@ static const char* gl4es_SamplersCube_uniform = "uniform samplerCube _gl4es_Samp
 static const char* gl_VertexAttrib = "gl_VertexAttrib_";
 static const char* gl4es_VertexAttrib = "_gl4es_VertexAttrib_";
 
+
+
 char gl_VA[MAX_VATTRIB][32] = {0};
 char gl4es_VA[MAX_VATTRIB][32] = {0};
+
+
+static int CountVaryings(const char* src)
+{
+    int n = 0;
+    const char* p = src;
+
+    while((p = strstr(p, "varying ")) != NULL) {
+        ++n;
+        p += 8;
+    }
+
+    return n;
+}
+
 
 char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
 {
@@ -506,7 +465,6 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     /* else no location or in / out are supported */
   }
   #endif
-  //sprintf(GLESFullHeader, GLESHeader, (wanthighp && hardext.highp==1 && !isVertex)?GLESUseFragHighp:"", (wanthighp)?"highp":"mediump", (wanthighp)?"highp":"mediump");
   sprintf(GLESFullHeader, GLESHeader[versionHeader], "", (wanthighp)?"highp":"mediump", (wanthighp)?"highp":"mediump");
 
   int tmpsize = strlen(pBuffer)*2+strlen(GLESFullHeader)+100;
@@ -540,10 +498,77 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline-2), e, Tmp, &tmpsize);
     ++headline;
   }
+
+// Translate sampler3D to sampler2D, map texture3D using a macro, and handle otex coordinates
+
+if (strstr(Tmp, "sampler3D") || strstr(Tmp, "texture3D")) {
+
+    Tmp = gl4es_inplace_replace(
+        Tmp,
+        &tmpsize,
+        "uniform sampler3D",
+        "uniform highp sampler2D");
+
+    Tmp = gl4es_inplace_replace(
+        Tmp,
+        &tmpsize,
+        "uniform highp sampler3D",
+        "uniform highp sampler2D");
+
+    const char* tex3d_fallback =
+//"#define texture3D texture2D\n";
+
+"vec4 _gl4es_texture3D(sampler2D tex, vec3 c)\n"
+"{\n"
+"    float slices = 16.0;\n"
+"    float slice = floor(clamp(c.z,0.0,0.9999) * slices);\n"
+"    vec2 uv;\n"
+"    uv.x = (c.x + slice) / slices;\n"
+"    uv.y = c.y;\n"
+"    return texture2D(tex, uv);\n"
+"}\n"
+"#define texture3D(s,c) _gl4es_texture3D(s,c)\n";
+
+
+
+
+Tmp = gl4es_inplace_insert(
+    gl4es_getline(Tmp, headline),
+    tex3d_fallback,
+    Tmp,
+    &tmpsize);
+
+headline += gl4es_countline(tex3d_fallback);
+
+
+}
+
+if (strstr(Tmp, "sampler2DShadow") || strstr(Tmp, "shadow2D")) {
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "sampler2DShadow", "sampler2D");
+
+const char* ShadowFallback =
+"float _gl4es_shadow_compare(sampler2D s, vec3 c)\n"
+"{\n"
+"    float depth = texture2D(s, c.xy).r;\n"
+"    return step(depth, c.z);\n"
+"}\n"
+"#define shadow2D(s,c) vec4(_gl4es_shadow_compare(s,c),0.0,0.0,1.0)\n";
+
+Tmp = gl4es_inplace_insert(
+    gl4es_getline(Tmp, headline),
+    ShadowFallback,
+    Tmp,
+    &tmpsize
+);
+
+headline += gl4es_countline(ShadowFallback);
+
+}
+
   // check if gl_FragDepth is used
   int fragdepth = (strstr(pBuffer, "gl_FragDepth"))?1:0;
   const char* GLESUseFragDepth = "#extension GL_EXT_frag_depth : enable\n";
-  const char* GLESFakeFragDepth = "mediump float fakeFragDepth = 0.0;\n";
+  const char* GLESFakeFragDepth = "highp float fakeFragDepth = 0.0;\n";
   if (fragdepth) {
     /* If #extension is used, it should be placed before the second line of the header. */
     if(hardext.fragdepth)
@@ -554,10 +579,6 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
   }
 
   const char* GLESUseShaderNonConstantGlobalInitialzers = "#extension GL_EXT_shader_non_constant_global_initializers : enable\n";
-  Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, 1), GLESUseShaderNonConstantGlobalInitialzers, Tmp, &tmpsize);
-  ++headline;
-
-  Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline-1), "#define GL4ES\n", Tmp, &tmpsize);
 
   int derivatives = (strstr(pBuffer, "dFdx(") || strstr(pBuffer, "dFdy(") || strstr(pBuffer, "fwidth("))?1:0;
   const char* GLESUseDerivative = "#extension GL_OES_standard_derivatives : enable\n";
@@ -574,20 +595,34 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline-1), GLESFakeDerivative, Tmp, &tmpsize);
     headline++;
   }
-  // check if draw_buffers may be used (no fallback here :( )
-  if(hardext.maxdrawbuffers>1 && strstr(pBuffer, "gl_FragData[")) {
-    Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, 1), useEXTDrawBuffers, Tmp, &tmpsize);
-  }
-  // if some functions are used, add some int/float alternative
+
+if (gl4es_find_string(Tmp, "gl_FragData[1]") ||
+    gl4es_find_string(Tmp, "gl_FragData[2]") ||
+    gl4es_find_string(Tmp, "gl_FragData[3]"))
+{
+    // Inject the extension required for multiple render targets in OpenGL ES 2.0
+    if (strstr(Tmp, "GL_EXT_draw_buffers") == NULL) {
+        Tmp = gl4es_inplace_replace(
+            Tmp,
+            &tmpsize,
+            "#version 100",
+            "#version 100\n#extension GL_EXT_draw_buffers : enable"
+        );
+    }
+}
+else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
+{
+    Tmp = gl4es_inplace_replace(
+        Tmp,
+        &tmpsize,
+        "gl_FragData[0]",
+        "gl_FragColor");
+}
+
+// if some functions are used, add some int/float alternative
   if(!fpeShader && !globals4es.nointovlhack) {
     if(strstr(Tmp, "pow(") || strstr(Tmp, "pow (")) {
         Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), HackAltPow, Tmp, &tmpsize);
-    }
-    if(strstr(Tmp, "max(") || strstr(Tmp, "max (")) {
-        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), HackAltMax, Tmp, &tmpsize);
-    }
-    if(strstr(Tmp, "min(") || strstr(Tmp, "min (")) {
-        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), HackAltMin, Tmp, &tmpsize);
     }
     if(strstr(Tmp, "clamp(") || strstr(Tmp, "clamp (")) {
         Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), HackAltClamp, Tmp, &tmpsize);
@@ -679,7 +714,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
           state = 1;  // integer part
         else if (*newptr == '.')
           state = 2;  // fractional part
-        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')' || (*newptr=='>') || (*newptr=='<')))
+	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else 
           state = 3; // something else
@@ -689,7 +724,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
           state = 1;  // integer part
         else if (*newptr == '.')
           state = 2;  // fractional part
-        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')' || (*newptr=='>') || (*newptr=='<')))
+	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else  if (*newptr == 'f' ) {
           // remove that f
@@ -701,7 +736,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
       case 2: // fractionnal part
         if ((*newptr >= '0') && (*newptr <= '9'))
           state = 2;
-        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')' || (*newptr=='>') || (*newptr=='<')))
+        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else  if (*newptr == 'f' ) {
           // remove that f
@@ -711,7 +746,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
           state = 3;
           break;
       case 3:
-        if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')' || (*newptr=='>') || (*newptr=='<')))
+        if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else      
           state = 3;
@@ -722,11 +757,17 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
   Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FragDepth", (hardext.fragdepth)?"gl_FragDepthEXT":"fakeFragDepth");
   // builtin attribs
   if(isVertex) {
-      // check for ftransform function
+// check for ftransform function
       if(strstr(Tmp, "ftransform(")) {
-        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_ftransformSource, Tmp, &tmpsize);
-        // don't increment headline count, as all variying and attributes should be created before
+          // Declare the required built-ins and insert the ftransform function body together
+          char ftrans_block[512];
+          sprintf(ftrans_block, "uniform highp mat4 _gl4es_ModelViewProjectionMatrix;\nattribute highp vec4 _gl4es_Vertex;\n%s", gl4es_ftransformSource);
+
+          Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), ftrans_block, Tmp, &tmpsize);
       }
+
+
+
       // check for builtin OpenGL attributes...
       int n = sizeof(builtin_attrib)/sizeof(builtin_attrib_t);
       for (int i=0; i<n; i++) {
@@ -772,10 +813,14 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     headline+=gl4es_countline(gl4es_backColorSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_BackColor", "_gl4es_BackColor");
   }
+
+
   if(strstr(Tmp, "gl_SecondaryColor") || need->need_secondary) {
     if(need->need_secondary<1) need->need_secondary = 1;
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_SecondaryColor", (need->need_secondary==1)?"gl_FrontSecondaryColor":"(gl_FrontFacing?gl_FrontSecondaryColor:gl_BackSecondaryColor)");
   }
+
+
   if(strstr(Tmp, "gl_FrontSecondaryColor") || need->need_secondary) {
     if(need->need_secondary<1) need->need_secondary = 1;
     nvarying+=1;
@@ -783,6 +828,10 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     headline+=gl4es_countline(gl4es_frontSecondaryColorSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FrontSecondaryColor", "_gl4es_FrontSecondaryColor");
   }
+
+
+
+
   if(strstr(Tmp, "gl_BackSecondaryColor") || (need->need_secondary==2)) {
     need->need_secondary = 2;
     nvarying+=1;
@@ -944,71 +993,61 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
       }
     }
   }
-  // Handling of gl_LightSource[x].halfVector => normalize(gl_LightSource[x].position - gl_Vertex), but what if in the FragShader ?
-/*  if(strstr(Tmp, "halfVector"))
-  {
-    char *p = Tmp;
-    while((p=strstr(p, "gl_LightSource["))) {
-      char *p2 = strchr(p, ']');
-      if (p2 && !strncmp(p2, "].halfVector", strlen("].halfVector"))) {
-        // found an occurrence, lets change
-        char p3[500];
-        strncpy(p3,p, (p2-p)+1); p3[(p2-p)+1]='\0';
-        char p4[500], p5[500];
-        sprintf(p4, "%s.halfVector", p3);
-        sprintf(p5, "normalize(normalize(%s.position.xyz) + vec3(0., 0., 1.))", p3);
-        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, p4, p5);
-        p = Tmp;
-      } else
-        ++p;
-    }
-  }*/
-  // cleaning up the "centroid" keyword...
-  if(strstr(Tmp, "centroid"))
-  {
-    char *p = Tmp;
-    while((p=strstr(p, "centroid"))!=NULL)
-    {
-      if(p[8]==' ' || p[8]=='\t') { // what next...
-        const char* p2 = gl4es_get_next_str(p+8);
-        if(strcmp(p2, "uniform")==0 || strcmp(p2, "varying")==0) {
-          memset(p, ' ', 8);  // erase the keyword...
-        }
-      } 
-      p+=8;
-    }
-  }
-  
+
+
+if(strstr(Tmp, "centroid")) {
+    Tmp = gl4es_inplace_replace(
+        Tmp, &tmpsize,
+        "centroid varying",
+        "varying");
+
+    Tmp = gl4es_inplace_replace(
+        Tmp, &tmpsize,
+        "centroid\tvarying",
+        "varying");
+
+    Tmp = gl4es_inplace_replace(
+        Tmp, &tmpsize,
+        "centroid attribute",
+        "attribute");
+
+    Tmp = gl4es_inplace_replace(
+        Tmp, &tmpsize,
+        "centroid\tattribute",
+        "attribute");
+}
+
+
   // check for builtin OpenGL gl_LightSource & friends
   if(strstr(Tmp, "gl_LightSourceParameters") || strstr(Tmp, "gl_LightSource"))
   {
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_LightSourceParametersSource, Tmp, &tmpsize);
     headline+=gl4es_countline(gl4es_LightSourceParametersSource);
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightSourceParameters", "_gl4es_LightSourceParameters");
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightSourceParameters", "gl4es_LightSourceParameters");
   }
   if(strstr(Tmp, "gl_LightModelParameters") || strstr(Tmp, "gl_LightModel"))
   {
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_LightModelParametersSource, Tmp, &tmpsize);
     headline+=gl4es_countline(gl4es_LightModelParametersSource);
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightModelParameters", "_gl4es_LightModelParameters");
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightModelParameters", "gl4es_LightModelParameters");
   }
   if(strstr(Tmp, "gl_LightModelProducts") || strstr(Tmp, "gl_FrontLightModelProduct") || strstr(Tmp, "gl_BackLightModelProduct"))
   {
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_LightModelProductsSource, Tmp, &tmpsize);
     headline+=gl4es_countline(gl4es_LightModelProductsSource);
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightModelProducts", "_gl4es_LightModelProducts");
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightModelProducts", "gl4es_LightModelProducts");
   }
   if(strstr(Tmp, "gl_LightProducts") || strstr(Tmp, "gl_FrontLightProduct") || strstr(Tmp, "gl_BackLightProduct"))
   {
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_LightProductsSource, Tmp, &tmpsize);
     headline+=gl4es_countline(gl4es_LightProductsSource);
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightProducts", "_gl4es_LightProducts");
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightProducts", "gl4es_LightProducts");
   }
   if(strstr(Tmp, "gl_MaterialParameters ") || (strstr(Tmp, "gl_FrontMaterial")) || strstr(Tmp, "gl_BackMaterial"))
   {
     Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_MaterialParametersSource, Tmp, &tmpsize);
     headline+=gl4es_countline(gl4es_MaterialParametersSource);
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_MaterialParameters", "_gl4es_MaterialParameters");
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_MaterialParameters", "gl4es_MaterialParameters");
   }
   if(strstr(Tmp, "gl_LightSource")) {
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_LightSource", "_gl4es_LightSource");
@@ -1059,7 +1098,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     {
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), gl4es_PointSpriteSource, Tmp, &tmpsize);
       headline+=gl4es_countline(gl4es_PointSpriteSource);
-      Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_PointParameters", "_gl4es_PointParameters");
+      Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_PointParameters", "gl4es_PointParameters");
     }
   if(strstr(Tmp, "gl_Point"))
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_Point", "_gl4es_Point");
@@ -1067,7 +1106,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     {
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), hardext.highp?gl4es_FogParametersSourceHighp:gl4es_FogParametersSource, Tmp, &tmpsize);
       headline+=gl4es_countline(gl4es_FogParametersSource);
-      Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FogParameters", "_gl4es_FogParameters");
+      Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FogParameters", "gl4es_FogParameters");
     }
   if(strstr(Tmp, "gl_Fog"))
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_Fog", "_gl4es_Fog");
@@ -1170,8 +1209,9 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
         Tmp = gl4es_inplace_replace(Tmp, &tmpsize, F, T);
         if(gl4es_find_string(Tmp, T)) {
           // add the uniform declaration if needed
-          sprintf(U, "uniform vec4 %s;\n", T);
-          Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
+//          sprintf(U, "uniform vec4 %s;\n", T);
+sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);  
+        Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
           headline += 1;
         }
       }
@@ -1179,7 +1219,14 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
       // need the full array...
       char T[60], U[300];
       sprintf(T, "_gl4es_%s_ProgramEnv", isVertex?"Vertex":"Fragment");
-      sprintf(U, "uniform vec4 %s[%d];\n", T, isVertex?MAX_VTX_PROG_ENV_PARAMS:MAX_FRG_PROG_ENV_PARAMS);
+sprintf(U,
+    "uniform %s vec4 %s[%d];\n",
+    isVertex || hardext.highp ? "highp" : "mediump",
+    T,
+    isVertex ? MAX_VTX_PROG_ENV_PARAMS :
+               MAX_FRG_PROG_ENV_PARAMS);
+
+
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
       headline += 1;
       Tmp = gl4es_inplace_replace(Tmp, &tmpsize, gl_ProgramEnv, T);
@@ -1213,7 +1260,8 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
         Tmp = gl4es_inplace_replace(Tmp, &tmpsize, F, T);
         if(gl4es_find_string(Tmp, T)) {
           // add the uniform declaration if needed
-          sprintf(U, "uniform vec4 %s;\n", T);
+sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);
+
           Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
           headline += 1;
         }
@@ -1222,7 +1270,7 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
       // need the full array...
       char T[60], U[300];
       sprintf(T, "_gl4es_%s_ProgramLocal", isVertex?"Vertex":"Fragment");
-      sprintf(U, "uniform vec4 %s[%d];\n", T, isVertex?MAX_VTX_PROG_LOC_PARAMS:MAX_FRG_PROG_LOC_PARAMS);
+sprintf(U, "uniform %s vec4 %s[%d];\n", isVertex || hardext.highp ? "highp" : "mediump", T, isVertex ? MAX_VTX_PROG_LOC_PARAMS : MAX_FRG_PROG_LOC_PARAMS);
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
       headline += 1;
       Tmp = gl4es_inplace_replace(Tmp, &tmpsize, gl_ProgramLocal, T);
@@ -1259,17 +1307,446 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "mat3x3", "mat3");
   }
   
-  // finish
-  if((globals4es.dbgshaderconv&maskafter)==maskafter) {
-    printf("New Shader source:\n%s\n", Tmp);
+
+
+  if(strstr(Tmp, "mat4x4")) {
+    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "mat4x4", "mat4");
   }
-  // clean preproc'd source
-  if(versionString != NULL)
-    free(versionString);
-  if(pEntry!=pBuffer)
-    free(pBuffer);
-  return Tmp;
+
+  if(strstr(Tmp, "mat2x3") || strstr(Tmp, "mat2x4") || 
+     strstr(Tmp, "mat3x2") || strstr(Tmp, "mat3x4") || 
+     strstr(Tmp, "mat4x2") || strstr(Tmp, "mat4x3")) {
+
+    const char* nonsquare_defs = 
+      "#define mat2x3 mat2x3_emu\n"
+      "#define mat2x4 mat2x4_emu\n"
+      "#define mat3x2 mat3x2_emu\n"
+      "#define mat3x4 mat3x4_emu\n"
+      "#define mat4x2 mat4x2_emu\n"
+      "#define mat4x3 mat4x3_emu\n"
+      "struct mat2x3_emu { vec3 col[2]; };\n"
+      "struct mat2x4_emu { vec4 col[2]; };\n"
+      "struct mat3x2_emu { vec2 col[3]; };\n"
+      "struct mat3x4_emu { vec4 col[3]; };\n"
+      "struct mat4x2_emu { vec2 col[4]; };\n"
+      "struct mat4x3_emu { vec3 col[4]; };\n";
+
+    Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), nonsquare_defs, Tmp, &tmpsize);
+    headline += gl4es_countline(nonsquare_defs);
+  }
+
+if(gl4es_find_string(Tmp, "uniform vec4 pc")) {
+        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "uniform vec4 pc", "uniform highp vec4 pc");
+    }
+
+
+// --- TEGRA 3 SAFE VARYING PACKER & ROBUST FRAGMENT DECLARATION INJECTOR ---
+    typedef struct {
+        char name[64];
+        unsigned used;
+    } tegra_var_t;
+
+    tegra_var_t vars[32];
+    int varcount = 0;
+    memset(vars, 0, sizeof(vars));
+
+    // Pass 1: Parse all varying declarations (if any exist)
+    char* scan_p = Tmp;
+    while(scan_p && (scan_p = strstr(scan_p, "varying")) != NULL) {
+        scan_p += 7;
+        while(*scan_p == ' ' || *scan_p == '\t' || *scan_p == '\r' || *scan_p == '\n') scan_p++;
+        
+        if(strncmp(scan_p, "highp ", 6) == 0) scan_p += 6;
+        else if(strncmp(scan_p, "mediump ", 8) == 0) scan_p += 8;
+        else if(strncmp(scan_p, "lowp ", 5) == 0) scan_p += 5;
+
+        while(*scan_p == ' ' || *scan_p == '\t') scan_p++;
+
+        if(strncmp(scan_p, "vec4 ", 5) == 0) {
+            scan_p += 5;
+            while(*scan_p == ' ' || *scan_p == '\t') scan_p++;
+            
+            char* e = strchr(scan_p, ';');
+            if(!e) break;
+
+            int len = (int)(e - scan_p);
+            while(len > 0 && (scan_p[len-1] == ' ' || scan_p[len-1] == '\t' || scan_p[len-1] == '\r' || scan_p[len-1] == '\n')) {
+                len--;
+            }
+
+            if(len > 0 && len < 63 && varcount < 32) {
+                strncpy(vars[varcount].name, scan_p, len);
+                vars[varcount].name[len] = '\0';
+                vars[varcount].used = 0;
+                varcount++;
+            }
+            scan_p = e;
+        } else {
+            scan_p++;
+        }
+    }
+
+    // Pass 2: Precise Component Usage Analysis
+    for(int i = 0; i < varcount; ++i) {
+        if(vars[i].name[0] == '\0') continue;
+
+        char pattern[128];
+        snprintf(pattern, sizeof(pattern), "%s.", vars[i].name);
+
+        char* u = Tmp;
+        while(u && (u = strstr(u, pattern)) != NULL) {
+            u += strlen(pattern);
+            while(*u == 'x' || *u == 'y' || *u == 'z' || *u == 'w') {
+                switch(*u) {
+                    case 'x': vars[i].used |= 1; break;
+                    case 'y': vars[i].used |= 2; break;
+                    case 'z': vars[i].used |= 4; break;
+                    case 'w': vars[i].used |= 8; break;
+                }
+                u++;
+            }
+        }
+
+        u = Tmp;
+        while(u && (u = strstr(u, vars[i].name)) != NULL) {
+            int is_decl = 0;
+            if(u > Tmp) {
+                char* line = u;
+                while(line > Tmp && line[-1] != '\n') line--;
+                if(strstr(line, "varying") == line) is_decl = 1;
+            }
+            if(!is_decl) {
+                size_t vlen = strlen(vars[i].name);
+                if(u + vlen < Tmp + strlen(Tmp)) {
+                    char c1 = u[vlen];
+                    if(c1 != '.') {
+                        vars[i].used |= 0x0F;
+                    }
+                }
+            }
+            u++;
+        }
+    }
+
+    // Pass 3: Bulletproof Fragment Shader Auto-Declaration Injector
+    // Automatically detects any used oT0-oT7 variables and injects them right before main()
+    if(strstr(Tmp, "//GLSLfp") != NULL || strstr(Tmp, "gl_FragData") != NULL) {
+        char decls[512] = "";
+        for(int t = 0; t <= 7; t++) {
+            char ot_name[16];
+            snprintf(ot_name, sizeof(ot_name), "oT%d", t);
+
+            if(strstr(Tmp, ot_name) != NULL) {
+                int already_declared = 0;
+                for(int i = 0; i < varcount; ++i) {
+                    if(strcmp(vars[i].name, ot_name) == 0) {
+                        already_declared = 1;
+                        break;
+                    }
+                }
+
+                if(!already_declared) {
+                    char single_decl[64];
+                    snprintf(single_decl, sizeof(single_decl), "varying vec4 %s;\n", ot_name);
+                    strcat(decls, single_decl);
+
+                    // Track into local list
+                    if(varcount < 32) {
+                        strcpy(vars[varcount].name, ot_name);
+                        vars[varcount].used = 0x0F;
+                        varcount++;
+                    }
+                }
+            }
+        }
+
+        if(decls[0] != '\0') {
+            char* main_p = strstr(Tmp, "void main()");
+            if(main_p) {
+                size_t prefix_len = (size_t)(main_p - Tmp);
+                size_t decls_len = strlen(decls);
+                size_t suffix_len = strlen(main_p);
+
+                char* new_tmp = (char*)malloc(prefix_len + decls_len + suffix_len + 1);
+                if(new_tmp) {
+                    memcpy(new_tmp, Tmp, prefix_len);
+                    strcpy(new_tmp + prefix_len, decls);
+                    strcpy(new_tmp + prefix_len + decls_len, main_p);
+                    free(Tmp);
+                    Tmp = new_tmp;
+                }
+            }
+        }
+    }
+
+    // Pass 4: Strip explicit oT7 declarations
+    const char* decl_pats[] = {
+        "varying vec4 oT7;\n",
+        "varying vec4 oT7;",
+        "varying highp vec4 oT7;\n",
+        "varying highp vec4 oT7;",
+        "centroid varying vec4 oT7;\n",
+        "centroid varying vec4 oT7;"
+    };
+    for(int d = 0; d < 6; d++) {
+        char* p;
+        while((p = strstr(Tmp, decl_pats[d])) != NULL) {
+            size_t tlen = strlen(decl_pats[d]);
+            size_t slen = strlen(Tmp);
+            char* new_tmp = (char*)malloc(slen - tlen + 1);
+            if(new_tmp) {
+                size_t prefix = (size_t)(p - Tmp);
+                memcpy(new_tmp, Tmp, prefix);
+                strcpy(new_tmp + prefix, p + tlen);
+                free(Tmp);
+                Tmp = new_tmp;
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Pass 5: Gather available free scalar slots across oT0-oT6
+    typedef struct {
+        char var_name[32];
+        char comp;
+    } free_slot_t;
+
+    free_slot_t slots[32];
+    int slot_count = 0;
+    char comps[4] = {'x', 'y', 'z', 'w'};
+
+    for(int i = 0; i < varcount; ++i) {
+        if(strcmp(vars[i].name, "oT7") == 0) continue;
+        if(strncmp(vars[i].name, "_gl4es", 6) == 0) continue;
+
+        for(int c = 0; c < 4; c++) {
+            if(!(vars[i].used & (1 << c))) {
+                strcpy(slots[slot_count].var_name, vars[i].name);
+                slots[slot_count].comp = comps[c];
+                slot_count++;
+            }
+        }
+    }
+
+    // Handle full vector assignment like "oT7 = r0;"
+    char* ot7_assign_pos;
+    while((ot7_assign_pos = strstr(Tmp, "oT7 =")) != NULL) {
+        char* stmt_end = strchr(ot7_assign_pos, ';');
+        if(!stmt_end) break;
+        
+        char* eq_sign = strchr(ot7_assign_pos, '=');
+        if(!eq_sign || eq_sign > stmt_end) break;
+
+        char replacement[256] = "";
+        char rhs[128];
+        size_t rhs_len = (size_t)(stmt_end - (eq_sign + 1));
+        strncpy(rhs, eq_sign + 1, rhs_len);
+        rhs[rhs_len] = '\0';
+
+        if(slot_count >= 4) {
+            snprintf(replacement, sizeof(replacement), 
+                "%s.%c = (%s).x;\n\t\t%s.%c = (%s).y;\n\t\t%s.%c = (%s).z;\n\t\t%s.%c = (%s).w;",
+                slots[0].var_name, slots[0].comp, rhs,
+                slots[1].var_name, slots[1].comp, rhs,
+                slots[2].var_name, slots[2].comp, rhs,
+                slots[3].var_name, slots[3].comp, rhs);
+        }
+
+        size_t target_len = (size_t)((stmt_end + 1) - ot7_assign_pos);
+        size_t slen = strlen(Tmp);
+        size_t rlen = strlen(replacement);
+        char* new_tmp = (char*)malloc(slen - target_len + rlen + 1);
+        if(new_tmp) {
+            size_t prefix = (size_t)(ot7_assign_pos - Tmp);
+            memcpy(new_tmp, Tmp, prefix);
+            strcpy(new_tmp + prefix, replacement);
+            strcpy(new_tmp + prefix + rlen, stmt_end + 1);
+            free(Tmp);
+            Tmp = new_tmp;
+        } else {
+            break;
+        }
+    }
+
+    // Handle oT7.xyz block references
+    char* ot7_xyz_pos;
+    while((ot7_xyz_pos = strstr(Tmp, "oT7.xyz")) != NULL) {
+        char* stmt_end = strchr(ot7_xyz_pos, ';');
+        if(!stmt_end) break;
+        
+        char* eq_sign = strchr(ot7_xyz_pos, '=');
+        if(!eq_sign || eq_sign > stmt_end) break;
+
+        char replacement[256] = "";
+        char rhs[128];
+        size_t rhs_len = (size_t)(stmt_end - (eq_sign + 1));
+        strncpy(rhs, eq_sign + 1, rhs_len);
+        rhs[rhs_len] = '\0';
+
+        if(slot_count >= 3) {
+            snprintf(replacement, sizeof(replacement), 
+                "%s.%c = (%s).x;\n\t\t%s.%c = (%s).y;\n\t\t%s.%c = (%s).z;",
+                slots[0].var_name, slots[0].comp, rhs,
+                slots[1].var_name, slots[1].comp, rhs,
+                slots[2].var_name, slots[2].comp, rhs);
+        }
+
+        size_t target_len = (size_t)((stmt_end + 1) - ot7_xyz_pos);
+        size_t slen = strlen(Tmp);
+        size_t rlen = strlen(replacement);
+        char* new_tmp = (char*)malloc(slen - target_len + rlen + 1);
+        if(new_tmp) {
+            size_t prefix = (size_t)(ot7_xyz_pos - Tmp);
+            memcpy(new_tmp, Tmp, prefix);
+            strcpy(new_tmp + prefix, replacement);
+            strcpy(new_tmp + prefix + rlen, stmt_end + 1);
+            free(Tmp);
+            Tmp = new_tmp;
+        } else {
+            break;
+        }
+    }
+
+    // Handle remaining individual oT7 component references (like oT7.w)
+    for(int c = 0; c < 4; c++) {
+        char target[64];
+        snprintf(target, sizeof(target), "oT7.%c", comps[c]);
+        
+        char* p;
+        while((p = strstr(Tmp, target)) != NULL) {
+            char replacement[64];
+            if(slot_count > 3) {
+                snprintf(replacement, sizeof(replacement), "%s.%c", slots[3].var_name, slots[3].comp);
+            } else {
+                snprintf(replacement, sizeof(replacement), "oT0.w");
+            }
+
+            size_t tlen = strlen(target);
+            size_t rlen = strlen(replacement);
+            size_t slen = strlen(Tmp);
+            char* new_tmp = (char*)malloc(slen - tlen + rlen + 1);
+            if(new_tmp) {
+                size_t prefix = (size_t)(p - Tmp);
+                memcpy(new_tmp, Tmp, prefix);
+                strcpy(new_tmp + prefix, replacement);
+                strcpy(new_tmp + prefix + rlen, p + tlen);
+                free(Tmp);
+                Tmp = new_tmp;
+            } else {
+                break;
+            }
+        }
+    }
+
+
+
+// Pass: Fix duplicate l-value swizzle components (e.g., "oT1.ww = ...")
+    // GLSL prohibits duplicate letters on the left-hand side of an assignment.
+    {
+        char* p = Tmp;
+        while ((p = strstr(p, ".")) != NULL) {
+            char* eq = strchr(p, '=');
+            char* sc = strchr(p, ';');
+            
+            // Ensure this dot is part of the left-hand side of an assignment
+            if (eq && sc && eq < sc) {
+                // Check if the swizzle has 2 characters and they are identical (e.g., .ww, .xx)
+                if (p[1] != '\0' && p[2] != '\0' && p[1] == p[2] && 
+                    (p[3] == ' ' || p[3] == '\t' || p[3] == '=')) {
+                    
+                    // Shift the rest of the string left by 1 character to remove the duplicate letter
+                    char* src = p + 2;
+                    char* dst = p + 1;
+                    while (*src != '\0') {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                    }
+                    *dst = '\0';
+                }
+            }
+            p++;
+        }
+    }
+
+
+// --- FOOLPROOF FRAGMENT SHADER oT0-oT7 AUTO-DECLARATOR ---
+    // If this is a fragment shader, ensure every used oT variable is declared.
+    if (strstr(Tmp, "//GLSLfp") != NULL || strstr(Tmp, "gl_FragData") != NULL) {
+        char fragment_decls[512] = "";
+        
+        // Scan for oT0 through oT7 usage anywhere in the shader source
+        for (int t = 0; t <= 7; t++) {
+            char ot_name[16];
+            snprintf(ot_name, sizeof(ot_name), "oT%d", t);
+            
+            // If the shader references oT[t] and it hasn't been declared yet...
+            if (strstr(Tmp, ot_name) != NULL) {
+                char search_decl[64];
+                snprintf(search_decl, sizeof(search_decl), "oT%d", t); // check if declaration exists
+                
+                // Simple check: if "varying vec4 oT[t]" isn't already present
+                char full_decl_pattern[64];
+                snprintf(full_decl_pattern, sizeof(full_decl_pattern), "oT%d", t);
+                
+                // We'll verify if it's already declared by checking for "varying ... oT[t]"
+                int already_declared = 0;
+                char* check_p = Tmp;
+                while ((check_p = strstr(check_p, ot_name)) != NULL) {
+                    // Look backwards to see if "varying" precedes it on the same line
+                    char* line_start = check_p;
+                    while (line_start > Tmp && line_start[-1] != '\n') line_start--;
+                    if (strstr(line_start, "varying") == line_start || strstr(line_start, "in ") == line_start) {
+                        already_declared = 1;
+                        break;
+                    }
+                    check_p++;
+                }
+                
+                if (!already_declared) {
+                    char single_decl[64];
+                    snprintf(single_decl, sizeof(single_decl), "varying vec4 oT%d;\n", t);
+                    strcat(fragment_decls, single_decl);
+                }
+            }
+        }
+        
+        // Inject the missing declarations right before void main()
+        if (fragment_decls[0] != '\0') {
+            char* main_p = strstr(Tmp, "void main()");
+            if (main_p) {
+                size_t prefix_len = (size_t)(main_p - Tmp);
+                size_t decls_len = strlen(fragment_decls);
+                size_t suffix_len = strlen(main_p);
+                
+                char* new_tmp = (char*)malloc(prefix_len + decls_len + suffix_len + 1);
+                if (new_tmp) {
+                    memcpy(new_tmp, Tmp, prefix_len);
+                    strcpy(new_tmp + prefix_len, fragment_decls);
+                    strcpy(new_tmp + prefix_len + decls_len, main_p);
+                    free(Tmp);
+                    Tmp = new_tmp;
+                }
+            }
+        }
+    }
+
+
+    if((globals4es.dbgshaderconv & maskafter) == maskafter) {
+        printf("New Shader source:\n%s\n", Tmp);
+    }
+
+    // Clean preproc'd source & exit safely
+    if(versionString != NULL)
+        free(versionString);
+    if(pEntry != pBuffer)
+        free(pBuffer);
+
+    return Tmp;
 }
+
+
 
 int isBuiltinAttrib(const char* name) {
     int n = sizeof(builtin_attrib)/sizeof(builtin_attrib_t);
@@ -1302,6 +1779,7 @@ int isBuiltinMatrix(const char* name) {
     }
     return ret;
 }
+
 
 const char* hasBuiltinAttrib(const char* vertexShader, int Att) {
     if(!vertexShader) // can happens (like if the shader is a pure GLES2 one)

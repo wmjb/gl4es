@@ -1,3 +1,4 @@
+
 #include "glx.h"
 #include "../gl/init.h"
 
@@ -51,6 +52,7 @@
 #define EGL_GL_COLORSPACE_SRGB_KHR              0x3089
 #define EGL_GL_COLORSPACE_LINEAR_KHR            0x308A
 #endif
+
 
 #ifndef NOEGL
 static bool eglInitialized = false;
@@ -311,7 +313,7 @@ static int get_config_default(Display *display, int attribute, int *value) {
             *value = 8;
             break;
         case GLX_DEPTH_SIZE:
-            *value = 24;//32;
+            *value = 16;//32;
             break;
 #endif
         case GLX_STENCIL_SIZE:
@@ -374,10 +376,21 @@ static int get_config_default(Display *display, int attribute, int *value) {
     DBG(printf(" -> 0x%04X\n", *value);)
     return 0;
 }
-
+/*
 static void init_display(Display *display) {
     LOAD_EGL(eglGetDisplay);
-    LOAD_EGL(eglGetPlatformDisplay);
+//    LOAD_EGL(eglGetPlatformDisplay);
+
+printf("init_displa*(%p)\n", display);
+
+
+printf("Trying EGL_DEFAULT_DISPLAY\n");
+eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
+printf("DEFAULT returned %p\n", eglDisplay);
+
+printf("Trying X11 display %p\n", display);
+EGLDisplay test = egl_eglGetDisplay(display);
+printf("X11 returned %p\n", test);
 
     if (! g_display) {
         g_display = display;//XOpenDisplay(NULL);
@@ -392,13 +405,77 @@ static void init_display(Display *display) {
 #endif
 
     if(!eglDisplay) {
-        if (globals4es.usefb || globals4es.usepbuffer) {
-            eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
-        } else {
+//        if (globals4es.usefb || globals4es.usepbuffer) {
+//            eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
+//printf("eglGetDisplay returned*%p\n", eglDisplay);
+//        } else {
             eglDisplay = egl_eglGetDisplay(display);
-        }
+printf("eglGetDisplay returned*%p\n", eglDisplay);
+//        }
     }
 }
+
+*/
+
+
+
+static void init_display(Display *display) {
+    LOAD_EGL(eglGetDisplay);
+    LOAD_EGL(eglGetProcAddress);
+
+    printf("init_display: Incoming X11 Display pointer = %p\n", (void*)display);
+
+    if (!g_display) {
+        g_display = display ? display : XOpenDisplay(NULL);
+    }
+
+    if (globals4es.usegbm) {
+        eglDisplay = OpenGBMDisplay(g_display);
+        if (eglDisplay != EGL_NO_DISPLAY) {
+            printf("init_display: GBM display initialized: %p\n", (void*)eglDisplay);
+            return;
+        }
+    }
+
+    // 1. Try passing the native X11 Display handle
+    if (g_display && egl_eglGetDisplay) {
+        printf("init_display: Querying eglGetDisplay with native X11 handle (%p)...\n", (void*)g_display);
+        eglDisplay = egl_eglGetDisplay((EGLNativeDisplayType)g_display);
+        printf("init_display: Native X11 eglGetDisplay returned: %p\n", (void*)eglDisplay);
+    }
+
+    // 2. Try eglGetPlatformDisplayEXT if standard call failed
+    if ((!eglDisplay || eglDisplay == EGL_NO_DISPLAY) && egl_eglGetProcAddress && g_display) {
+        typedef EGLDisplay (EGLAPIENTRYP PFNEGLGETPLATFORMDISPLAYEXTPROC)(EGLenum platform, void *native_display, const EGLint *attrib_list);
+        PFNEGLGETPLATFORMDISPLAYEXTPROC pfn_eglGetPlatformDisplayEXT = 
+            (PFNEGLGETPLATFORMDISPLAYEXTPROC)egl_eglGetProcAddress("eglGetPlatformDisplayEXT");
+
+        if (pfn_eglGetPlatformDisplayEXT) {
+            printf("init_display: Attempting eglGetPlatformDisplayEXT(EGL_PLATFORM_X11_EXT)...\n");
+// Tegra requires specifying the default screen attribute
+    const EGLint attribs[] = {
+        0x31D6 /* EGL_PLATFORM_X11_SCREEN_EXT */, 0,
+        EGL_NONE
+    };
+            eglDisplay = pfn_eglGetPlatformDisplayEXT(0x31D5 /* EGL_PLATFORM_X11_EXT */, (void*)g_display, attribs);
+            printf("init_display: eglGetPlatformDisplayEXT returned: %p\n", (void*)eglDisplay);
+        }
+    }
+
+    // 3. Tegra Fallback: Use EGL_DEFAULT_DISPLAY if direct X11 connection fails
+    if (!eglDisplay || eglDisplay == EGL_NO_DISPLAY) {
+        printf("init_display: X11 display wrapping unsupported by Tegra libEGL. Falling back to EGL_DEFAULT_DISPLAY...\n");
+        eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
+        printf("init_display: EGL_DEFAULT_DISPLAY returned: %p\n", (void*)eglDisplay);
+    }
+
+    if (!eglDisplay || eglDisplay == EGL_NO_DISPLAY) {
+        printf("LIBGL: ERROR - Could not establish EGLDisplay connection.\n");
+    }
+}
+
+
+
 
 static void fill1GLXFBConfig(Display *display, EGLConfig eglConfig, int DB, GLXFBConfig fbConfig) {
     LOAD_EGL(eglGetConfigAttrib);
@@ -478,7 +555,14 @@ static void init_eglconfig(Display *display) {
     }
 }
 
+/*
+
 static int InitEGL(Display *display) {
+
+printf("InitEGL: display=%p eglDisplay=%p eglInitialized=%d\n",
+
+display, eglDisplay, eglInitialized);
+
     if(eglInitialized)
         return 1;
 
@@ -493,9 +577,71 @@ static int InitEGL(Display *display) {
     EGLint result = egl_eglInitialize(eglDisplay, NULL, NULL);
     if (result != EGL_TRUE) {
         CheckEGLErrors();
-        LOGE("Unable to initialize EGL display.\n");
+        LOGE("Unable to initialize EGL display PATH A.\n");
+//LOGE("Unable to initialize EGL. error=0x%04X\n",
+//    egl_eglGetError());
         return 0;
     }
+    eglInitialized = true;
+    return 1;
+}
+*/
+
+
+static int InitEGL(Display *display) {
+    printf("InitEGL: display=%p eglDisplay=%p eglInitialized=%d\n",
+            display, eglDisplay, eglInitialized);
+
+    if (eglInitialized)
+        return 1;
+
+    // Load essential EGL functions required for display initialization
+    LOAD_EGL(eglGetDisplay);
+    LOAD_EGL(eglBindAPI);
+    LOAD_EGL(eglInitialize);
+
+    if (!eglDisplay || eglDisplay == EGL_NO_DISPLAY) {
+        // 1. Try initializing using the passed X11 Display handle directly
+        if (display && egl_eglGetDisplay) {
+            printf("InitEGL: Trying passed X11 Display (%p)...\n", (void*)display);
+            eglDisplay = egl_eglGetDisplay((EGLNativeDisplayType)display);
+        }
+
+        // 2. If passed display fails or is NULL, try opening a fresh X11 connection
+        if ((!eglDisplay || eglDisplay == EGL_NO_DISPLAY) && egl_eglGetDisplay) {
+            printf("InitEGL: Trying fresh XOpenDisplay(NULL)...\n");
+            Display *x_dpy = XOpenDisplay(NULL);
+            if (x_dpy) {
+                eglDisplay = egl_eglGetDisplay((EGLNativeDisplayType)x_dpy);
+            }
+        }
+
+        // 3. Fall back to gl4es's default init_display routine if still uninitialized
+        if (!eglDisplay || eglDisplay == EGL_NO_DISPLAY) {
+            printf("InitEGL: Direct X11 display failed. Falling back to init_display()...\n");
+            init_display(display);
+        }
+
+        if (eglDisplay == EGL_NO_DISPLAY) {
+            LOGE("InitEGL: Failed to obtain any valid EGLDisplay handle.\n");
+            return 0;
+        }
+    }
+
+    printf("InitEGL: Final eglDisplay = %p\n", (void*)eglDisplay);
+
+    // Bind GLES API and initialize EGL
+    if (egl_eglBindAPI) {
+        egl_eglBindAPI(EGL_OPENGL_ES_API);
+    }
+
+    EGLint result = egl_eglInitialize(eglDisplay, NULL, NULL);
+    if (result != EGL_TRUE) {
+        CheckEGLErrors();
+        LOGE("Unable to initialize EGL display PATH A.\n");
+        return 0;
+    }
+
     eglInitialized = true;
     return 1;
 }
@@ -730,10 +876,10 @@ GLXContext gl4es_glXCreateContext(Display *display,
         EGL_BLUE_SIZE, glxfbconfig->blueBits,
         EGL_ALPHA_SIZE, (hardext.eglnoalpha)?0:glxfbconfig->alphaBits,
 #endif
-        EGL_DEPTH_SIZE, depthBits,
+        EGL_DEPTH_SIZE, 16,//depthBits,
         EGL_RENDERABLE_TYPE, (hardext.esversion==1)?EGL_OPENGL_ES_BIT:EGL_OPENGL_ES2_BIT,
         //EGL_BUFFER_SIZE, depthBits,
-        EGL_STENCIL_SIZE, glxfbconfig->stencilBits,
+        EGL_STENCIL_SIZE, 8,//, glxfbconfig->stencilBits,
 
         EGL_SAMPLE_BUFFERS, glxfbconfig->nMultiSampleBuffers,
         EGL_SAMPLES, glxfbconfig->multiSampleSize,
@@ -953,7 +1099,9 @@ GLXContext gl4es_glXCreateContextAttribsARB(Display *display, GLXFBConfig config
             result = InitEGL(display);
             if (!result) {
                 CheckEGLErrors();
-                LOGE("Unable to initialize EGL display.\n");
+                LOGE("Unable to initialize EGL display PATH B.\n");
+//LOGE("Unable to initialize EGL. error=0x%04X\n",
+//    egl_eglGetError());
                 return fake;
             }
         }
@@ -1079,47 +1227,56 @@ Display *gl4es_glXGetCurrentDisplay() {
     return XOpenDisplay(NULL);
 }
 
+
+
 XVisualInfo *gl4es_glXChooseVisual(Display *display,
                              int screen,
-                             int *attributes) {
+                            int *attributes)
+{
     DBG(printf("glXChooseVisual(%p, %d, %p[", display, screen, attributes);)
-    DBG(if(attributes) {for(int* a=attributes; *a!=0; ++a)printf("%x,", *a);printf("0");})
+    DBG(if(attributes){for(int* a=attributes;*a!=0;++a)printf("%x,",*a);printf("0");})
     DBG(printf("])\n");)
 
-    // create a new attribute list for glXChooseFBConfig based on the attributes liste given...
     int attr[50];
     int idx = 0;
     int cur = 0;
     int ask_depth = 0;
-    int vis_class = TrueColor;
+
     if(attributes) {
 
         int ask_rgba = 0;
-        while (attributes[cur]) {
+
+        while(attributes[cur]) {
+
             switch(attributes[cur]) {
+
                 case GLX_RGBA:
-                    ask_rgba = 1;   // only rgba will be supported?
+                    ask_rgba = 1;
                     break;
-                case GLX_USE_GL:    // yeah, I know
+
+                case GLX_USE_GL:
                     break;
+
                 case GLX_BUFFER_SIZE:
                 case GLX_STEREO:
                 case GLX_ACCUM_RED_SIZE:
                 case GLX_ACCUM_GREEN_SIZE:
                 case GLX_ACCUM_BLUE_SIZE:
                 case GLX_ACCUM_ALPHA_SIZE:
-                    ++cur;  // ignored
+                    ++cur;
                     break;
+
                 case GLX_DOUBLEBUFFER:
                     attr[idx++] = GLX_DOUBLEBUFFER;
                     attr[idx++] = 1;
                     break;
+
                 case GLX_RED_SIZE:
                 case GLX_GREEN_SIZE:
                 case GLX_BLUE_SIZE:
                 case GLX_ALPHA_SIZE:
-                    ask_depth += attributes[cur+1];
-                    // fallback is intended
+                    ask_depth += attributes[cur + 1];
+
                 case GLX_DEPTH_SIZE:
                 case GLX_STENCIL_SIZE:
                 case GLX_LEVEL:
@@ -1128,55 +1285,113 @@ XVisualInfo *gl4es_glXChooseVisual(Display *display,
                     attr[idx++] = attributes[cur++];
                     attr[idx++] = attributes[cur];
                     break;
+
                 case GLX_X_VISUAL_TYPE:
                     attr[idx++] = attributes[cur++];
                     attr[idx++] = attributes[cur];
-                    if(attributes[cur] == GLX_DIRECT_COLOR)
-                        vis_class = DirectColor;
                     break;
             }
+
             ++cur;
         }
-        attr[idx++] = 0;    // end list
+
+        attr[idx++] = 0;
 
         if(!ask_rgba)
-            return NULL;    // only TrueColor profile...
+            return NULL;
     }
+
     glx_default_depth = XDefaultDepth(display, screen);
-    if (glx_default_depth != 16 && glx_default_depth != 24  && glx_default_depth != 32)
-        LOGD("unusual desktop color depth %d\n", glx_default_depth);
 
-#ifndef PANDORA
-    // PANDORA only has 16bits X11, lets ignore 32bits requests
-/*    if(ask_depth>glx_default_depth)
-        glx_default_depth = ask_depth;  // higher depth...
-*/  // this makes window of TokiTory transparent...
-#endif
-
-    XVisualInfo xvinfo = {0};
-    xvinfo.depth = glx_default_depth;
-    xvinfo.class = TrueColor;
-    int n;
-    XVisualInfo *visuals = XGetVisualInfo(display, VisualDepthMask|VisualClassMask, &xvinfo, &n);
-    if (!n) {
-        LOGD("Warning, gl4es_glXChooseVisual: XGetVisualInfo gives 0 VisualInfo for %d depth and TrueColor class\n", glx_default_depth);
-        return NULL;
-    }
-
-    // create and store the glxConfig that goes with thoses attributes
     int count = 1;
-    GLXFBConfig * confs = NULL;
+    GLXFBConfig *confs = NULL;
+
     if(cur)
         confs = gl4es_glXChooseFBConfig(display, screen, attr, &count);
     else
         confs = gl4es_glXGetFBConfigs(display, screen, &count);
-    if(!count) {
-        DBG(printf("glXChooseVisual return %p (because no Config found)\n", NULL);)
+
+    if(!confs || !count) {
+        DBG(printf("glXChooseVisual return NULL (no config)\n");)
         return NULL;
     }
+
+    XVisualInfo xvinfo;
+    memset(&xvinfo, 0, sizeof(xvinfo));
+
+    XVisualInfo *visuals = NULL;
+    int n = 0;
+
+    /*
+     * Tegra path:
+     * Prefer EGL_NATIVE_VISUAL_ID attached to the
+     * actual EGLConfig selected by GL4ES.
+     */
+
+    if(confs[0] && confs[0]->associatedVisualId) {
+
+        xvinfo.visualid =
+            (VisualID)confs[0]->associatedVisualId;
+
+        visuals =
+            XGetVisualInfo(
+                display,
+                VisualIDMask,
+                &xvinfo,
+                &n);
+
+        if(visuals && n > 0) {
+
+            DBG(
+                printf(
+                    "LIBGL: Using EGL VisualID 0x%lx\n",
+                    (unsigned long)xvinfo.visualid
+                );
+            )
+
+            AddFBVisual(visuals, confs);
+
+            DBG(printf("glXChooseVisual return %p\n", visuals);)
+
+            return visuals;
+        }
+    }
+
+    /*
+     * Fallback path
+     */
+
+    memset(&xvinfo, 0, sizeof(xvinfo));
+
+    xvinfo.depth =
+        glx_default_depth;
+
+    xvinfo.class =
+        TrueColor;
+
+    visuals =
+        XGetVisualInfo(
+            display,
+            VisualDepthMask | VisualClassMask,
+            &xvinfo,
+            &n);
+
+    if(!visuals || !n) {
+
+        LOGD(
+            "Warning, gl4es_glXChooseVisual: "
+            "XGetVisualInfo gives 0 VisualInfo "
+            "for depth %d\n",
+            glx_default_depth
+        );
+
+        return NULL;
+    }
+
     AddFBVisual(visuals, confs);
 
     DBG(printf("glXChooseVisual return %p\n", visuals);)
+
     return visuals;
 }
 
@@ -1357,15 +1572,72 @@ Bool gl4es_glXMakeCurrent(Display *display,
 #if 0//ndef NO_GBM
                                 if(globals4es.usegbm) {
                                     LOAD_EGL_EXT(eglCreatePlatformWindowSurface);
+
                                     eglSurf = egl_eglCreatePlatformWindowSurface(eglDisplay, context->eglConfigs[context->eglconfigIdx], context->nativewin, attrib_list);
+
                                 } else
 #endif
+
+
+#include <X11/Xlib.h>
+
+printf("[GL4ES Debug] nativedisp=%p, nativewin=%p\n", context->display, (void*)context->nativewin);
+
+Display *dpy = (Display*)context->display;
+if (!dpy) {
+    // Fallback: Open a direct connection to X server if GL4ES stored display is NULL
+    dpy = XOpenDisplay(NULL);
+    printf("[GL4ES Debug] Opened fallback XOpenDisplay = %p\n", dpy);
+}
+
+if (dpy && context->nativewin) {
+    XWindowAttributes attr;
+    Status s = XGetWindowAttributes(dpy, (Window)context->nativewin, &attr);
+    printf("[GL4ES Debug] XGetWindowAttributes status=%d, map_state=%d, width=%d, height=%d, root=%p\n",
+           s, attr.map_state, attr.width, attr.height, (void*)attr.root);
+    
+    // Explicitly map using direct X11 connection
+    XMapSubwindows(dpy, (Window)context->nativewin);
+    XMapWindow(dpy, (Window)context->nativewin);
+    XFlush(dpy);
+}
+
+
+
+XWindowAttributes a;
+
+if(XGetWindowAttributes(
+        dpy,
+        (Window)context->nativewin,
+        &a))
+{
+    printf(
+        "Window check: mapped=%d width=%d height=%d depth=%d visual=%p class=%d\n",
+        a.map_state,
+        a.width,
+        a.height,
+        a.depth,
+        a.visual,
+        a.class
+    );
+}
+
+
+
+
                                 eglSurf = egl_eglCreateWindowSurface(eglDisplay, context->eglConfigs[context->eglconfigIdx], (EGLNativeWindowType)context->nativewin, attrib_list);
+if (eglSurf != EGL_NO_SURFACE)
+
+printf("CreateWindowSurface succeeded: %p\n", (void *)eglSurf); //fullscreen path
+
+
                             } else {
                                 DBG(printf("LIBGL: EglSurf Recycled\n");)
                             }
                             eglSurface = context->eglSurface = eglSurf;
-                            if(!eglSurf) {
+//                            if(!eglSurf) {
+if(eglSurf == EGL_NO_SURFACE) {
+
                                 DBG(printf("LIBGL: Warning, EglSurf is null\n");)
                                 CheckEGLErrors();
                             }
@@ -1390,12 +1662,152 @@ Bool gl4es_glXMakeCurrent(Display *display,
                                 ++(*context->shared_eglsurface);
                             }
                         }
-                        if(eglSurf == EGL_NO_SURFACE) {
+//                        if(eglSurf == EGL_NO_SURFACE) {
+
+
+
+/*
+printf("drawable=%p\n", (void*)drawable);
                             eglSurf = context->eglSurface = egl_eglCreateWindowSurface(eglDisplay, context->eglConfigs[0], drawable, attrib_list);
+printf("config=%p\n", (void*)context->eglConfigs[0]);
+printf("eglSurf=%p\n", (void*)eglSurf);
+
+*/
+
+
+
+
+if(eglSurf == EGL_NO_SURFACE) {
+
+
+                            // 1. First try NULL attrib_list (es2gears native Tegra path)
+                            eglSurf = egl_eglCreateWindowSurface(eglDisplay, context->eglConfigs[0], drawable, NULL);
+
+
+
+if (eglSurf != EGL_NO_SURFACE)
+				printf("CreateWindowSurface succeeded: %p\n", (void *)eglSurf);
+
+
+if (eglSurf == EGL_NO_SURFACE) {
+LOAD_EGL(eglGetError);
+printf("CreateWindowSurface failed, eglError=0x%x\n",
+egl_eglGetError());
+}
+
+
+EGLint visual;
+LOAD_EGL(eglGetConfigAttrib);
+
+egl_eglGetConfigAttrib(
+    eglDisplay,
+    context->eglConfigs[0],
+    EGL_NATIVE_VISUAL_ID,
+    &visual);
+
+printf("EGL_NATIVE_VISUAL_ID=0x%x\n", visual);
+
+XWindowAttributes xwa;
+
+
+if(XGetWindowAttributes(display, drawable, &xwa))
+{
+    printf("map_state=%d\n", xwa.map_state);
+    printf("class=%d\n", xwa.class);
+    printf("depth=%d\n", xwa.depth);
+    printf("width=%d height=%d\n",
+           xwa.width,
+           xwa.height);
+}
+
+printf("eglconfig=%p\n",
+       (void *)context->eglConfigs[0]);
+
+printf("window depth=%d\n", xwa.depth);
+printf("window visual=%p\n", (void *)xwa.visual);
+
+
+printf("window visual id=0x%lx\n",
+
+(unsigned long)XVisualIDFromVisual(xwa.visual));
+printf("window visual ptr=%p\n",
+
+(void *)xwa.visual);
+
+printf("drawable=0x%lx\n",
+       (unsigned long)drawable);
+
+EGLint r,g,b,a,d,s;
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_RED_SIZE, &r);
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_GREEN_SIZE, &g);
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_BLUE_SIZE, &b);
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_ALPHA_SIZE, &a);
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_DEPTH_SIZE, &d);
+
+egl_eglGetConfigAttrib(eglDisplay, context->eglConfigs[0],
+                       EGL_STENCIL_SIZE, &s);
+
+printf("EGL config: R=%d G=%d B=%d A=%d D=%d S=%d\n",
+       r,g,b,a,d,s);
+
+
+                            // 2. If NULL fails, retry with requested attrib_list
+                            if (eglSurf == EGL_NO_SURFACE && attrib_list[0] != EGL_NONE) {
+                                eglSurf = egl_eglCreateWindowSurface(eglDisplay, context->eglConfigs[0], drawable, attrib_list);
+                            }
+
+
+
+                            // 3. TEGRA FALLBACK: If Tegra rejects native X11 window (0x300B), fall back to PBuffer
+                            if (eglSurf == EGL_NO_SURFACE) {
+                                DBG(printf("LIBGL: eglCreateWindowSurface failed (0x%x) on XID 0x%lx. Attempting PBuffer fallback...\n", 
+                                           eglGetError ? eglGetError() : 0, (unsigned long)drawable);)
+
+                                unsigned int w = 800, h = 600, border, d;
+                                Window root;
+                                int x, y;
+                                if (XGetGeometry(display, drawable, &root, &x, &y, &w, &h, &border, &d)) {
+                                    DBG(printf("LIBGL: Window dimensions for fallback: %dx%d\n", w, h);)
+                                }
+
+                                EGLint pbuf_attribs[] = {
+                                    EGL_WIDTH, (EGLint)w,
+                                    EGL_HEIGHT, (EGLint)h,
+                                    EGL_NONE
+                                };
+
+                                LOAD_EGL(eglCreatePbufferSurface);
+                                if (egl_eglCreatePbufferSurface) {
+                                    eglSurf = egl_eglCreatePbufferSurface(eglDisplay, context->eglConfigs[0], pbuf_attribs);
+                                    if (eglSurf != EGL_NO_SURFACE) {
+                                        DBG(printf("LIBGL: Successfully created Tegra windowed PBuffer surface %p (%dx%d)\n", eglSurf, w, h);)
+					printf("PBUFFER FALLBACK USED\n");
+
+                                    }
+                                }
+
+                            }
+
+                            context->eglSurface = eglSurf;
                         } else {
                             DBG(printf("LIBGL: eglSurf Recycled\n");)
                             context->eglSurface = eglSurf;
                         }
+
+
+
+
+
                         if(!eglSurf) {
                             DBG(printf("LIBGL: Warning, eglSurf is null\n");)
                             CheckEGLErrors();
@@ -1405,6 +1817,8 @@ Bool gl4es_glXMakeCurrent(Display *display,
             }
         }
         eglSurf = context->eglSurface;
+
+
         eglCtx = context->eglContext;
     }
     EGLBoolean result;
@@ -1862,8 +2276,10 @@ GLXFBConfig *gl4es_glXChooseFBConfig(Display *display, int screen,
     if (eglInitialized == false) {
         if(!InitEGL((globals4es.usefb || globals4es.usepbuffer)?g_display:display)) {
             CheckEGLErrors();
-            LOGE("Unable to initialize EGL.\n");
-            return NULL;
+            LOGE("Unable to initialize EGL PATH C.\n");
+//LOGE("Unable to initialize EGL. error=0x%04X\n",
+  //  egl_eglGetError());
+          return NULL;
             *count = 0;
         }
     }
@@ -1963,8 +2379,11 @@ GLXFBConfig *gl4es_glXGetFBConfigs(Display *display, int screen, int *count) {
     if (eglInitialized == false) {
         if(!InitEGL((globals4es.usefb || globals4es.usepbuffer)?g_display:display)) {
             CheckEGLErrors();
-            LOGE("Unable to initialize EGL.\n");
-            return NULL;
+            LOGE("Unable to initialize EGL PATH D.\n");
+//LOGE("Unable to initialize EGL. error=0x%04X\n",
+//    egl_eglGetError());  
+
+          return NULL;
             *count = 0;
         }
     }
@@ -2598,7 +3017,10 @@ int createPixBuffer(Display * dpy, int bpp, const EGLint * egl_attribs, NativePi
         result = InitEGL((globals4es.usefb || globals4es.usepbuffer)?g_display:dpy);
         if (!result) {
             CheckEGLErrors();
-            LOGE("Unable to initialize EGL display.\n");
+            LOGE("Unable to initialize EGL display PATH E.\n");
+//LOGE("Unable to initialize EGL. error=0x%04X\n",
+//    egl_eglGetError());
+
             return 0;
         }
     }

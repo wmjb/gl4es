@@ -96,6 +96,8 @@ void initialize_gl4es() {
     globals4es.mergelist = 1;
     globals4es.queries = 1;
     globals4es.beginend = 1;
+
+
     #ifdef PYRA
     GetEnvVarInt("LIBGL_DEEPBIND", &globals4es.deepbind, 0);
     #else
@@ -210,6 +212,9 @@ void initialize_gl4es() {
         globals4es.gl = (globals4es.es==1)?15:21;  // forcing GL 1.5 for es1.1 and GL 2.1 for es2.0
         break;
     }
+
+
+//globals4es.gl = 21; // tegra patch
 
     SHUT_LOGD("Using GLES %s backend\n", (globals4es.es==1)?"1.1":"2.0");
 
@@ -425,6 +430,12 @@ void initialize_gl4es() {
         break;
     }
 
+
+// Force full NPOT and FBO support for tegra
+//    globals4es.npot = 1;         // Enable NPOT capability
+ //   globals4es.usefbo = 1;        // Force enable internal FBO handling
+ //   globals4es.nolumalpha = 0;    // Keep luminance/alpha textures enabled
+
     if(IsEnvVarFalse("LIBGL_GLQUERIES")) {
         globals4es.queries = 0;
         SHUT_LOGD("Don't expose fake glQueries functions\n");
@@ -549,6 +560,8 @@ void initialize_gl4es() {
               break;
         }
       }
+
+//globals4es.usevbo = 1; // tegra patch
 
     globals4es.fbomakecurrent = 0;
     if((hardext.vendor & VEND_ARM) || (globals4es.usefb))
@@ -705,6 +718,9 @@ void initialize_gl4es() {
                 fpe_readPSA();
             }
         }
+
+//globals4es.nopsa = 1; //tegra patch
+
     } else 
       SHUT_LOGD("Not using PSA (prgbin_n=%d, notexarray=%d)\n", hardext.prgbin_n, globals4es.notexarray);
 
@@ -712,12 +728,68 @@ void initialize_gl4es() {
     if(GetEnvVarFloat("LIBGL_FB_TEX_SCALE",&globals4es.fbtexscale,0.0f)) {
       SHUT_LOGD("Framebuffer Textures will be scaled by %.2f\n", globals4es.fbtexscale);
         }
+
+
+//tegra patches
+/*
+globals4es.usefb = 0;
+    globals4es.usepbuffer = 1;
+globals4es.gl = 21;           // Report GL 2.1
+    globals4es.es = 2;            // Force GLES 2.0 backend
+    globals4es.usefbo = 1;        // Enable Framebuffer Objects
+    globals4es.usevbo = 1;        // Set to 0 if VBO rendering segfaults
+    globals4es.nopsa = 1;         // Prevent shader archive corruption
+    globals4es.logshader = 1;     // Print shader errors to terminal
+    globals4es.silentstub = 1;    // Suppress non-critical GL stub warnings
+globals4es.glxrecycle = 0;
+globals4es.glxnative = 1;
+globals4es.blitfullscreen = 1;
+
+*/
+
+
+/*
+
+globals4es.glxnative = 1;
+globals4es.blitfullscreen = 1;
+    globals4es.nopsa = 1;         // Prevent shader archive corruption
+    globals4es.logshader = 1;     // Print shader errors to terminal
+    globals4es.silentstub = 1;    // Suppress non-critical GL stub warnings
+
+globals4es.gl = 21;           // Report GL 2.1
+    globals4es.es = 2;            // Force GLES 2.0 backend
+
+//globals4es.usefb = 1;             // Enable FBO/Framebuffer mode
+    globals4es.usefbo = 1;            // Use hardware Framebuffer Objects
+    globals4es.usepbuffer = 0;        // Keep off - FBO blitting is significantly faster than PBuffer
+    
+    // Hardware acceleration hacks for FBO blitting
+    globals4es.blitfb0 = 1;           // Force SwapBuffers on FBO 0 blit (bypasses CPU readback)
+    globals4es.blitfullscreen = 1;    // Accelerate full-screen FBO blits via EGLImage/GPU
+    globals4es.fboforcetex = 1;       // Attach color0 directly to texture
+    globals4es.skiptexcopies = 1;     // Prevent duplicate CPU texture copies
+    
+    // Compatibility fixes
+    globals4es.glxrecycle = 0;        // Prevent surface destruction crashes
+    globals4es.usevbo = 1;            // Keep VBOs enabled on GPU
+*/
+
+//globals4es.glxnative = 1;
+
+  //  globals4es.glxrecycle = 0;  
+
+//globals4es.gl = 21;           // Report GL 2.1
+//    globals4es.es = 2;            // Force GLES 2.0 backend
+
+//globals4es.nointovlhack = 1;
+
 }
 
 
 #ifndef NOX11
 void FreeFBVisual();
 #endif
+
 #ifdef NO_INIT_CONSTRUCTOR
 EXPORT
 #else

@@ -165,10 +165,10 @@ EGLDisplay gl4es_eglGetCurrentDisplay(void) {
 }
 
 EGLDisplay gl4es_eglGetPlatformDisplay(EGLenum platform, void *native_display, const EGLAttrib *attrib_list) {
-    LOAD_EGL_EXT(eglGetPlatformDisplay);
-    if (egl_eglGetPlatformDisplay)
-        return egl_eglGetPlatformDisplay(platform, native_display, attrib_list);
-    else {
+//    LOAD_EGL_EXT(eglGetPlatformDisplay);
+//    if (egl_eglGetPlatformDisplay)
+//        return egl_eglGetPlatformDisplay(platform, native_display, attrib_list);
+//    else {
         LOAD_EGL(eglGetDisplay);
         return egl_eglGetDisplay((EGLNativeDisplayType)native_display);
     }

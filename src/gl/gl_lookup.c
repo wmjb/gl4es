@@ -6,10 +6,12 @@
 #include "init.h"
 #include "line.h"
 #include "loader.h"
+#include "fence.h"
 #include "render.h"
 #include "texgen.h"
 #include "vertexattrib.h"
 #include "oldprogram.h"
+#include "occlusion.h"
 #include "samplers.h"
 #include "matrix.h"
 
@@ -38,6 +40,29 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     DBG(printf("glGetProcAddress(\"%s\")", name);)
     // generated gles wrappers
     #include "glesfuncs.inc"
+
+    // GL_NV_fence
+    _EX(glGenFencesNV);
+    _EXT(glGenFencesNV);
+    _ARB(glGenFencesNV);
+    _EX(glDeleteFencesNV);
+    _EXT(glDeleteFencesNV);
+    _ARB(glDeleteFencesNV);
+    _EX(glSetFenceNV);
+    _EXT(glSetFenceNV);
+    _ARB(glSetFenceNV);
+    _EX(glTestFenceNV);
+    _EXT(glTestFenceNV);
+    _ARB(glTestFenceNV);
+    _EX(glFinishFenceNV);
+    _EXT(glFinishFenceNV);
+    _ARB(glFinishFenceNV);
+    _EX(glGetFenceivNV);
+    _EXT(glGetFenceivNV);
+    _ARB(glGetFenceivNV);
+    _EX(glIsFenceNV);
+    _EXT(glIsFenceNV);
+    _ARB(glIsFenceNV);
 
     // GL_EXT_texture_object (yeah, super old!)
     _EXT(glGenTextures);
@@ -100,6 +125,17 @@ void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
     _EXT(glDeleteVertexArrays);
     _EXT(glIsVertexArray);
     
+    //occlusion
+    _EX(glGenQueriesARB);
+    _EX(glDeleteQueriesARB);
+    _EX(glIsQueryARB);
+    _EX(glBeginQueryARB);
+    _EX(glEndQueryARB);
+    _EX(glGetQueryObjectivARB);
+    _EX(glGetQueryObjectuivARB);
+
+
+
     // GL_ARB_frameBuffer_ext
     if(hardext.fbo) {
         _EX(glFramebufferTexture1D);

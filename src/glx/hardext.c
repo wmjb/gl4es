@@ -141,7 +141,7 @@ void GetHardwareExtensions(int notest)
     LOAD_EGL(eglBindAPI);
     LOAD_EGL(eglInitialize);
     LOAD_EGL(eglGetDisplay);
-    LOAD_EGL(eglGetPlatformDisplay);
+//    LOAD_EGL(eglGetPlatformDisplay);
     LOAD_EGL(eglCreatePbufferSurface);
     LOAD_EGL(eglDestroySurface);
     LOAD_EGL(eglDestroyContext);
@@ -211,6 +211,7 @@ void GetHardwareExtensions(int notest)
     }
 #else
         eglDisplay = egl_eglGetDisplay(EGL_DEFAULT_DISPLAY);
+//eglDisplay = egl_eglGetDisplay(display);
 #endif
 
     egl_eglBindAPI(EGL_OPENGL_ES_API);
@@ -446,10 +447,10 @@ void GetHardwareExtensions(int notest)
     if(hardext.esversion>1) {
         if(testGLSL("#version 120", 1))
             hardext.glsl120 = 1;
-        if(testGLSL("#version 300 es", 0))
-            hardext.glsl300es = 1;
-        if(testGLSL("#version 310 es", 1))
-            hardext.glsl310es = 1;
+   //     if(testGLSL("#version 300 es", 0))
+            hardext.glsl300es = 0;
+   //     if(testGLSL("#version 310 es", 1))
+            hardext.glsl310es = 0;
     }
     if(!gl4es_original_renderer) {
         const char* renderer = (const char *) gles_glGetString(GL_RENDERER);

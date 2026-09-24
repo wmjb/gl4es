@@ -115,6 +115,8 @@ void BuildExtensionsList() {
                 "GL_EXT_texture_compression_dxt1 "
                 "GL_EXT_texture_compression_dxt3 "
                 "GL_EXT_texture_compression_dxt5 "
+		"GL_ANGLE_texture_compression_dxt3 "
+		"GL_ANGLE_texture_compression_dxt5 "
                 "GL_ARB_point_parameters "
                 "GL_EXT_point_parameters "
                 "GL_EXT_stencil_wrap "
@@ -131,6 +133,8 @@ void BuildExtensionsList() {
                 "GL_EXT_draw_elements_base_vertex "
                 "GL_ARB_map_buffer_range "
                 "GL_NV_blend_square "
+		"GL_NV_fence "
+		"GL_ARB_occlusion_query "
 //                "GL_EXT_blend_logic_op "
 				);
         if(!globals4es.notexrect)
