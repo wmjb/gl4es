@@ -38,7 +38,8 @@ const builtin_attrib_t builtin_attrib[] = {
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", ARB_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", ARB_MULTITEXCOORD15},
     {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", ARB_SECONDARY},
-    {"gl_Normal", "_gl4es_Normal", "vec4", "highp", ARB_NORMAL},
+//    {"gl_Normal", "_gl4es_Normal", "vec4", "highp", ARB_NORMAL},
+    {"gl_Normal", "_gl4es_Normal", "vec3", "highp", ARB_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", ARB_FOGCOORD}
 };
 
@@ -392,6 +393,7 @@ static int CountVaryings(const char* src)
         p += 8;
     }
 
+
     return n;
 }
 
@@ -465,8 +467,8 @@ char* ConvertShader(const char* pEntry, int isVertex, shaderconv_need_t *need)
     /* else no location or in / out are supported */
   }
   #endif
-  sprintf(GLESFullHeader, GLESHeader[versionHeader], "", (wanthighp)?"highp":"mediump", (wanthighp)?"highp":"mediump");
-
+//  sprintf(GLESFullHeader, GLESHeader[versionHeader], "", (wanthighp)?"highp":"mediump", (wanthighp)?"highp":"mediump");
+  sprintf(GLESFullHeader, GLESHeader[versionHeader], "", "highp", "highp");
   int tmpsize = strlen(pBuffer)*2+strlen(GLESFullHeader)+100;
   char* Tmp = (char*)calloc(1, tmpsize);
   strcpy(Tmp, pBuffer);
@@ -515,7 +517,7 @@ if (strstr(Tmp, "sampler3D") || strstr(Tmp, "texture3D")) {
         "uniform highp sampler3D",
         "uniform highp sampler2D");
 
-
+/*
 const char* tex3d_fallback =
 "vec4 _gl4es_texture3D(sampler2D tex, vec3 c)\n"
 "{\n"
@@ -531,6 +533,15 @@ const char* tex3d_fallback =
 "    return mix(a, b, fracz);\n"
 "}\n"
 "#define texture3D(s,c) _gl4es_texture3D(s,c)\n";
+*/
+
+//debug test
+const char* tex3d_fallback =
+"vec4 _gl4es_texture3D(sampler2D tex, vec3 c)\n"
+"{\n"
+"    return vec4(1.0,0.0,1.0,1.0);\n"
+"}\n"
+"#define texture3D(s,c) _gl4es_texture3D(s,c)\n";
 
 
 Tmp = gl4es_inplace_insert(
@@ -544,9 +555,29 @@ headline += gl4es_countline(tex3d_fallback);
 
 }
 
-if (strstr(Tmp, "sampler2DShadow") || strstr(Tmp, "shadow2D")) {
-    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "sampler2DShadow", "sampler2D");
 
+
+if (strstr(Tmp, "sampler2DShadow") || strstr(Tmp, "shadow2D")) {
+//    Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "sampler2DShadow", "sampler2D");
+
+
+Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
+    "highp sampler2DShadow",
+    "highp sampler2D");
+
+Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
+    "mediump sampler2DShadow",
+    "mediump sampler2D");
+
+Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
+    "lowp sampler2DShadow",
+    "lowp sampler2D");
+
+Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
+    "sampler2DShadow",
+    "sampler2D");
+
+/*
 const char* ShadowFallback =
 "float _gl4es_shadow_compare(sampler2D s, vec3 c)\n"
 "{\n"
@@ -554,6 +585,18 @@ const char* ShadowFallback =
 "    return (depth >= c.z) ? 1.0 : 0.0;\n"
 "}\n"
 "#define shadow2D(s,c) vec4(_gl4es_shadow_compare(s,c),0.0,0.0,1.0)\n";
+*/
+
+
+
+//debug static value test
+const char* ShadowFallback =
+"float _gl4es_shadow_compare(sampler2D s, vec3 c)\n"
+"{\n"
+"    return 1.0;\n"
+"}\n"
+"#define shadow2D(s,c) vec4(_gl4es_shadow_compare(s,c),0.0,0.0,1.0)\n";
+
 
 Tmp = gl4es_inplace_insert(
     gl4es_getline(Tmp, headline),
@@ -562,9 +605,18 @@ Tmp = gl4es_inplace_insert(
     &tmpsize
 );
 
+
+
+
 headline += gl4es_countline(ShadowFallback);
 
+
+
 }
+
+
+
+
 
   // check if gl_FragDepth is used
   int fragdepth = (strstr(pBuffer, "gl_FragDepth"))?1:0;
@@ -1025,9 +1077,9 @@ if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
                   need->need_mvpmatrix = 1;
               }
               if(builtin_matrix[i].texarray)
-                  sprintf(def, "uniform %s%s %s[%d];\n", (ishighp)?"highp ":"mediump ", builtin_matrix[i].type, builtin_matrix[i].name, ntex);
+                  sprintf(def, "uniform %s%s %s[%d];\n", "highp ", builtin_matrix[i].type, builtin_matrix[i].name, ntex);
               else
-                  sprintf(def, "uniform %s%s %s;\n", (ishighp)?"highp ":"mediump ", builtin_matrix[i].type, builtin_matrix[i].name);
+                  sprintf(def, "uniform %s%s %s;\n", "highp ", builtin_matrix[i].type, builtin_matrix[i].name);
               Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline++), def, Tmp, &tmpsize);
           }
       }
@@ -1250,7 +1302,9 @@ if(strstr(Tmp, "centroid")) {
         if(gl4es_find_string(Tmp, T)) {
           // add the uniform declaration if needed
 //          sprintf(U, "uniform vec4 %s;\n", T);
-sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);  
+//sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);  
+sprintf(U, "uniform highp vec4 %s;\n", T);
+
         Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
           headline += 1;
         }
@@ -1259,13 +1313,19 @@ sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediu
       // need the full array...
       char T[60], U[300];
       sprintf(T, "_gl4es_%s_ProgramEnv", isVertex?"Vertex":"Fragment");
-sprintf(U,
+/* sprintf(U,
     "uniform %s vec4 %s[%d];\n",
     isVertex || hardext.highp ? "highp" : "mediump",
     T,
     isVertex ? MAX_VTX_PROG_ENV_PARAMS :
                MAX_FRG_PROG_ENV_PARAMS);
 
+*/
+sprintf(U,
+    "uniform highp vec4 %s[%d];\n",
+    T,
+    isVertex ? MAX_VTX_PROG_ENV_PARAMS :
+               MAX_FRG_PROG_ENV_PARAMS);
 
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
       headline += 1;
@@ -1300,8 +1360,8 @@ sprintf(U,
         Tmp = gl4es_inplace_replace(Tmp, &tmpsize, F, T);
         if(gl4es_find_string(Tmp, T)) {
           // add the uniform declaration if needed
-sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);
-
+//sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediump", T);
+sprintf(U, "uniform highp vec4 %s;\n", T);
           Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
           headline += 1;
         }
@@ -1310,7 +1370,8 @@ sprintf(U, "uniform %s vec4 %s;\n", isVertex || hardext.highp ? "highp" : "mediu
       // need the full array...
       char T[60], U[300];
       sprintf(T, "_gl4es_%s_ProgramLocal", isVertex?"Vertex":"Fragment");
-sprintf(U, "uniform %s vec4 %s[%d];\n", isVertex || hardext.highp ? "highp" : "mediump", T, isVertex ? MAX_VTX_PROG_LOC_PARAMS : MAX_FRG_PROG_LOC_PARAMS);
+//sprintf(U, "uniform %s vec4 %s[%d];\n", isVertex || hardext.highp ? "highp" : "mediump", T, isVertex ? MAX_VTX_PROG_LOC_PARAMS : MAX_FRG_PROG_LOC_PARAMS);
+sprintf(U, "uniform highp vec4 %s;\n", T);
       Tmp = gl4es_inplace_insert(gl4es_getline(Tmp, headline), U, Tmp, &tmpsize);
       headline += 1;
       Tmp = gl4es_inplace_replace(Tmp, &tmpsize, gl_ProgramLocal, T);
@@ -1776,6 +1837,38 @@ if(gl4es_find_string(Tmp, "uniform vec4 pc")) {
     }
 
 #endif
+
+
+
+for (int i = 0; i < 8; i++) {
+    char olddecl[64];
+    char newdecl[64];
+
+    sprintf(olddecl, "varying vec4 oT%d;", i);
+    sprintf(newdecl, "varying highp vec4 oT%d;", i);
+
+    Tmp = gl4es_inplace_replace(
+        Tmp,
+        &tmpsize,
+        olddecl,
+        newdecl);
+}
+
+
+printf(
+"%s varyings=%d\n",
+isVertex ? "Vertex" : "Fragment",
+CountVaryings(Tmp)
+);
+
+
+if(CountVaryings(Tmp) > 8)
+{
+printf("HIGH VARYING SHADER:\n%s\n", Tmp);
+};
+
+
+
 //printf("New Shader source:\n%s\n", Tmp);
 
     if((globals4es.dbgshaderconv & maskafter) == maskafter) {
