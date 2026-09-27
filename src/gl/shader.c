@@ -181,7 +181,9 @@ void APIENTRY_GL4ES gl4es_glShaderSource(GLuint shader, GLsizei count, const GLc
 
 
 // send source to GLES2 hardware if any
-/*        const char *final_source = glshader->converted ? glshader->converted : glshader->source;
+
+/*
+        const char *final_source = glshader->converted ? glshader->converted : glshader->source;
 
         printf("\n========== [GL4ES] SENDING SHADER TO GPU (ID: %d, Type: %s) ==========\n", 
                shader, PrintEnum(glshader->type));

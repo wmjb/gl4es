@@ -714,7 +714,10 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
           state = 1;  // integer part
         else if (*newptr == '.')
           state = 2;  // fractional part
-	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
+// Add ',' and '=' to your separator checks in the state machine:
+else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<') || (*newptr==',') || (*newptr=='='))
+
+//	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else 
           state = 3; // something else
@@ -724,7 +727,10 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
           state = 1;  // integer part
         else if (*newptr == '.')
           state = 2;  // fractional part
-	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
+
+// Add ',' and '=' to your separator checks in the state machine:
+else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<') || (*newptr==',') || (*newptr=='='))
+//	else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else  if (*newptr == 'f' ) {
           // remove that f
@@ -736,7 +742,9 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
       case 2: // fractionnal part
         if ((*newptr >= '0') && (*newptr <= '9'))
           state = 2;
-        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
+// Add ',' and '=' to your separator checks in the state machine:
+else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<') || (*newptr==',') || (*newptr=='='))
+//        else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
           state = 0; // separator
         else  if (*newptr == 'f' ) {
           // remove that f
@@ -746,7 +754,9 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
           state = 3;
           break;
       case 3:
-        if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
+//        if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<'))
+// Add ',' and '=' to your separator checks in the state machine:
+	if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') || (*newptr=='+') || (*newptr=='*') || (*newptr=='/') || (*newptr=='(') || (*newptr==')') || (*newptr=='>') || (*newptr=='<') || (*newptr==',') || (*newptr=='='))
           state = 0; // separator
         else      
           state = 3;
@@ -799,6 +809,7 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
     if(need->need_color<1) need->need_color = 1;
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_Color", (need->need_color==1)?"gl_FrontColor":"(gl_FrontFacing?gl_FrontColor:gl_BackColor)");
   }
+
   if(strstr(Tmp, "gl_FrontColor") || need->need_color) {
     if(need->need_color<1) need->need_color = 1;
     nvarying+=1;
@@ -806,6 +817,7 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
     headline+=gl4es_countline(gl4es_frontColorSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FrontColor", "_gl4es_FrontColor");
   }
+
   if(strstr(Tmp, "gl_BackColor") || (need->need_color==2)) {
     need->need_color = 2;
     nvarying+=1;
@@ -839,6 +851,8 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
     headline+=gl4es_countline(gl4es_backSecondaryColorSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_BackSecondaryColor", "_gl4es_BackSecondaryColor");
   }
+
+#if 0
   if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
     need->need_fogcoord = 1;
     nvarying+=1;
@@ -846,6 +860,31 @@ else if (gl4es_find_string(Tmp, "gl_FragData[0]"))
     headline+=gl4es_countline(gl4es_fogcoordSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FogFragCoord", "_gl4es_FogFragCoord");
   }
+#endif
+
+
+// strip fog
+
+if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
+
+    need->need_fogcoord = 0;
+
+    Tmp = gl4es_inplace_replace(
+        Tmp,
+        &tmpsize,
+        "gl_FogFragCoord",
+        "fog_disabled"
+    );
+
+    Tmp = gl4es_inplace_insert(
+        gl4es_getline(Tmp, headline),
+        "float fog_disabled;\n",
+        Tmp,
+        &tmpsize
+    );
+}
+
+
   // Get the max_texunit and the calc notexarray
   if(strstr(Tmp, "gl_TexCoord") || need->need_texcoord!=-1) {
     int ntex = need->need_texcoord;
@@ -1340,6 +1379,9 @@ if(gl4es_find_string(Tmp, "uniform vec4 pc")) {
     }
 
 
+
+#if 0
+
 // --- TEGRA 3 SAFE VARYING PACKER & ROBUST FRAGMENT DECLARATION INJECTOR ---
     typedef struct {
         char name[64];
@@ -1732,6 +1774,8 @@ if(gl4es_find_string(Tmp, "uniform vec4 pc")) {
         }
     }
 
+#endif
+//printf("New Shader source:\n%s\n", Tmp);
 
     if((globals4es.dbgshaderconv & maskafter) == maskafter) {
         printf("New Shader source:\n%s\n", Tmp);
