@@ -38,7 +38,7 @@ const builtin_attrib_t builtin_attrib[] = {
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", ARB_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", ARB_MULTITEXCOORD15},
     {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", ARB_SECONDARY},
-    {"gl_Normal", "_gl4es_Normal", "vec3", "highp", ARB_NORMAL},
+    {"gl_Normal", "_gl4es_Normal", "vec4", "highp", ARB_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", ARB_FOGCOORD}
 };
 
@@ -62,7 +62,7 @@ const builtin_attrib_t builtin_attrib_compressed[] = {
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", COMP_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", COMP_MULTITEXCOORD15},
     {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", COMP_SECONDARY},
-    {"gl_Normal", "_gl4es_Normal", "vec3", "highp", COMP_NORMAL},
+    {"gl_Normal", "_gl4es_Normal", "vec4", "highp", COMP_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", COMP_FOGCOORD}
 };
 
@@ -515,21 +515,22 @@ if (strstr(Tmp, "sampler3D") || strstr(Tmp, "texture3D")) {
         "uniform highp sampler3D",
         "uniform highp sampler2D");
 
-    const char* tex3d_fallback =
-//"#define texture3D texture2D\n";
 
+const char* tex3d_fallback =
 "vec4 _gl4es_texture3D(sampler2D tex, vec3 c)\n"
 "{\n"
 "    float slices = 16.0;\n"
-"    float slice = floor(clamp(c.z,0.0,0.9999) * slices);\n"
-"    vec2 uv;\n"
-"    uv.x = (c.x + slice) / slices;\n"
-"    uv.y = c.y;\n"
-"    return texture2D(tex, uv);\n"
+"    float z = clamp(c.z, 0.0, 1.0) * (slices - 1.0);\n"
+"    float slice0 = floor(z);\n"
+"    float slice1 = min(slice0 + 1.0, slices - 1.0);\n"
+"    float fracz = fract(z);\n"
+"    vec2 uv0 = vec2((c.x + slice0) / slices, c.y);\n"
+"    vec2 uv1 = vec2((c.x + slice1) / slices, c.y);\n"
+"    vec4 a = texture2D(tex, uv0);\n"
+"    vec4 b = texture2D(tex, uv1);\n"
+"    return mix(a, b, fracz);\n"
 "}\n"
 "#define texture3D(s,c) _gl4es_texture3D(s,c)\n";
-
-
 
 
 Tmp = gl4es_inplace_insert(
@@ -550,7 +551,7 @@ const char* ShadowFallback =
 "float _gl4es_shadow_compare(sampler2D s, vec3 c)\n"
 "{\n"
 "    float depth = texture2D(s, c.xy).r;\n"
-"    return step(depth, c.z);\n"
+"    return (depth >= c.z) ? 1.0 : 0.0;\n"
 "}\n"
 "#define shadow2D(s,c) vec4(_gl4es_shadow_compare(s,c),0.0,0.0,1.0)\n";
 
@@ -873,7 +874,7 @@ if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
         Tmp,
         &tmpsize,
         "gl_FogFragCoord",
-        "fog_disabled"
+"fog_disabled"
     );
 
     Tmp = gl4es_inplace_insert(
