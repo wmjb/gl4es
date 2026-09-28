@@ -191,7 +191,7 @@ static const char* gl4es_PointSpriteSource =
 "  highp float fadeThresholdSize;\n"
 "  highp float distanceConstantAttenuation;\n"
 "  highp float distanceLinearAttenuation;\n"
-"  higp float distanceQuadraticAttenuation;\n"
+"  highp float distanceQuadraticAttenuation;\n"
 "};\n"
 "uniform gl4es_PointParameters _gl4es_Point;\n";
 
@@ -313,12 +313,114 @@ static const char* gl4es_transpose =
 "             m[0][2], m[1][2], m[2][2], m[3][2],\n"
 "             m[0][3], m[1][3], m[2][3], m[3][3]);\n"
 "}\n";
-
+/*
 static const char* HackAltPow = "";
 static const char* HackAltMax = "";
 static const char* HackAltMin = "";
 static const char* HackAltClamp = "";
 static const char* HackAltMod = "";
+*/
+static const char* HackAltPow =
+"float pow(float f, float a) {\n"
+"    return exp2(a * log2(f));\n"
+"}\n"
+"float pow(float f, int a) {\n"
+"    return exp2(float(a) * log2(f));\n"
+"}\n";
+
+static const char* HackAltMax =
+"float max(float a, float b) {\n"
+"    return (a > b) ? a : b;\n"
+"}\n"
+"vec2 max(vec2 a, vec2 b) {\n"
+"    return vec2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);\n"
+"}\n"
+"vec3 max(vec3 a, vec3 b) {\n"
+"    return vec3(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y, a.z > b.z ? a.z : b.z);\n"
+"}\n"
+"vec4 max(vec4 a, vec4 b) {\n"
+"    return vec4(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y, a.z > b.z ? a.z : b.z, a.w > b.w ? a.w : b.w);\n"
+"}\n";
+
+static const char* HackAltMin =
+"float min(float a, float b) {\n"
+"    return (a < b) ? a : b;\n"
+"}\n"
+"vec2 min(vec2 a, vec2 b) {\n"
+"    return vec2(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);\n"
+"}\n"
+"vec3 min(vec3 a, vec3 b) {\n"
+"    return vec3(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y, a.z < b.z ? a.z : b.z);\n"
+"}\n"
+"vec4 min(vec4 a, vec4 b) {\n"
+"    return vec4(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y, a.z < b.z ? a.z : b.z, a.w < b.w ? a.w : b.w);\n"
+"}\n";
+
+static const char* HackAltClamp =
+"float clamp(float f, float a, float b) {\n"
+" return min(max(f, a), b);\n"
+"}\n"
+"float clamp(float f, int a, int b) {\n"
+" return min(max(f, float(a)), float(b));\n"
+"}\n"
+"float clamp(float f, float a, int b) {\n"
+" return min(max(f, a), float(b));\n"
+"}\n"
+"float clamp(float f, int a, float b) {\n"
+" return min(max(f, float(a)), b);\n"
+"}\n"
+"vec2 clamp(vec2 f, vec2 a, vec2 b) {\n"
+" return min(max(f, a), b);\n"
+"}\n"
+"vec2 clamp(vec2 f, int a, int b) {\n"
+" return min(max(f, float(a)), float(b));\n"
+"}\n"
+"vec2 clamp(vec2 f, float a, int b) {\n"
+" return min(max(f, a), float(b));\n"
+"}\n"
+"vec2 clamp(vec2 f, int a, float b) {\n"
+" return min(max(f, float(a)), b);\n"
+"}\n"
+"vec3 clamp(vec3 f, vec3 a, vec3 b) {\n"
+" return min(max(f, a), b);\n"
+"}\n"
+"vec3 clamp(vec3 f, int a, int b) {\n"
+" return min(max(f, float(a)), float(b));\n"
+"}\n"
+"vec3 clamp(vec3 f, float a, int b) {\n"
+" return min(max(f, a), float(b));\n"
+"}\n"
+"vec3 clamp(vec3 f, int a, float b) {\n"
+" return min(max(f, float(a)), b);\n"
+"}\n"
+"vec4 clamp(vec4 f, vec4 a, vec4 b) {\n"
+" return min(max(f, a), b);\n"
+"}\n"
+"vec4 clamp(vec4 f, int a, int b) {\n"
+" return min(max(f, float(a)), float(b));\n"
+"}\n"
+"vec4 clamp(vec4 f, float a, int b) {\n"
+" return min(max(f, a), float(b));\n"
+"}\n"
+"vec4 clamp(vec4 f, int a, float b) {\n"
+" return min(max(f, float(a)), b);\n"
+"}\n";
+
+static const char* HackAltMod =
+"float mod(float f, int a) {\n"
+" return f - float(a) * floor(f / float(a));\n"
+"}\n"
+"vec2 mod(vec2 f, int a) {\n"
+" return f - float(a) * floor(f / float(a));\n"
+"}\n"
+"vec3 mod(vec3 f, int a) {\n"
+" return f - float(a) * floor(f / float(a));\n"
+"}\n"
+"vec4 mod(vec4 f, int a) {\n"
+" return f - float(a) * floor(f / float(a));\n"
+"}\n";
+
+
 
 static const char* texture2DLodAlt =
 "vec4 _gl4es_texture2DLod(sampler2D sampler, vec2 coord, float lod) {\n"
