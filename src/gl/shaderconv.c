@@ -63,7 +63,7 @@ const builtin_attrib_t builtin_attrib_compressed[] = {
     {"gl_MultiTexCoord14", "_gl4es_MultiTexCoord14", "vec4", "highp", COMP_MULTITEXCOORD14},
     {"gl_MultiTexCoord15", "_gl4es_MultiTexCoord15", "vec4", "highp", COMP_MULTITEXCOORD15},
     {"gl_SecondaryColor", "_gl4es_SecondaryColor", "vec4", "highp", COMP_SECONDARY},
-    {"gl_Normal", "_gl4es_Normal", "vec4", "highp", COMP_NORMAL},
+    {"gl_Normal", "_gl4es_Normal", "vec3", "highp", COMP_NORMAL},
     {"gl_FogCoord", "_gl4es_FogCoord", "float", "highp", COMP_FOGCOORD}
 };
 
@@ -129,35 +129,35 @@ static const char* gl4es_MaxTextureCoordsSource =
 static const char* gl4es_LightSourceParametersSource =
 "struct gl4es_LightSourceParameters\n"
 "{\n"
-"   vec4 ambient;\n"
-"   vec4 diffuse;\n"
-"   vec4 specular;\n"
-"   vec4 position;\n"
-"   vec4 halfVector;\n"
-"   vec3 spotDirection;\n"
-"   float spotExponent;\n"
-"   float spotCutoff;\n"
-"   float spotCosCutoff;\n"
-"   float constantAttenuation;\n"
-"   float linearAttenuation;\n"
-"   float quadraticAttenuation;\n"
+"  highp vec4 ambient;\n"
+"  highp vec4 diffuse;\n"
+"  highp vec4 specular;\n"
+"  highp vec4 position;\n"
+"  highp vec4 halfVector;\n"
+"  highp vec3 spotDirection;\n"
+"  highp float spotExponent;\n"
+"  highp float spotCutoff;\n"
+"  highp float spotCosCutoff;\n"
+"  highp float constantAttenuation;\n"
+"  highp float linearAttenuation;\n"
+"  highp float quadraticAttenuation;\n"
 "};\n"
 "uniform gl4es_LightSourceParameters _gl4es_LightSource[8];\n";
 
 static const char* gl4es_LightModelParametersSource =
 "struct gl4es_LightModelParameters {\n"
-"  vec4 ambient;\n"
+" highp vec4 ambient;\n"
 "};\n"
 "uniform gl4es_LightModelParameters _gl4es_LightModel;\n";
 
 static const char* gl4es_MaterialParametersSource =
 "struct gl4es_MaterialParameters\n"
 "{\n"
-"   vec4 emission;\n"
-"   vec4 ambient;\n"
-"   vec4 diffuse;\n"
-"   vec4 specular;\n"
-"   float shininess;\n"
+"  highp vec4 emission;\n"
+"  highp vec4 ambient;\n"
+"  highp vec4 diffuse;\n"
+"  highp vec4 specular;\n"
+"  highp float shininess;\n"
 "};\n"
 "uniform gl4es_MaterialParameters _gl4es_FrontMaterial;\n"
 "uniform gl4es_MaterialParameters _gl4es_BackMaterial;\n";
@@ -165,7 +165,7 @@ static const char* gl4es_MaterialParametersSource =
 static const char* gl4es_LightModelProductsSource =
 "struct gl4es_LightModelProducts\n"
 "{\n"
-"   vec4 sceneColor;\n"
+"  highp vec4 sceneColor;\n"
 "};\n"
 "uniform gl4es_LightModelProducts _gl4es_FrontLightModelProduct;\n"
 "uniform gl4es_LightModelProducts _gl4es_BackLightModelProduct;\n";
@@ -174,9 +174,9 @@ static const char* gl4es_LightProductsSource =
 "#define _gl4es_MaxLights 8\n"
 "struct gl4es_LightProducts\n"
 "{\n"
-"   vec4 ambient;\n"
-"   vec4 diffuse;\n"
-"   vec4 specular;\n"
+"  highp vec4 ambient;\n"
+"  highp vec4 diffuse;\n"
+"  highp vec4 specular;\n"
 "};\n"
 "uniform gl4es_LightProducts _gl4es_FrontLightProduct[_gl4es_MaxLights];\n"
 "uniform gl4es_LightProducts _gl4es_BackLightProduct[_gl4es_MaxLights];\n";
@@ -185,13 +185,13 @@ static const char* gl4es_LightProductsSource =
 static const char* gl4es_PointSpriteSource =
 "struct gl4es_PointParameters\n"
 "{\n"
-"   float size;\n"
-"   float sizeMin;\n"
-"   float sizeMax;\n"
-"   float fadeThresholdSize;\n"
-"   float distanceConstantAttenuation;\n"
-"   float distanceLinearAttenuation;\n"
-"   float distanceQuadraticAttenuation;\n"
+"  highp float size;\n"
+"  highp float sizeMin;\n"
+"  highp float sizeMax;\n"
+"  highp float fadeThresholdSize;\n"
+"  highp float distanceConstantAttenuation;\n"
+"  highp float distanceLinearAttenuation;\n"
+"  higp float distanceQuadraticAttenuation;\n"
 "};\n"
 "uniform gl4es_PointParameters _gl4es_Point;\n";
 
@@ -217,28 +217,28 @@ static const char* gl4es_FogParametersSourceHighp =
 
 static const char* gl4es_texenvcolorSource =
 "#define _gl4es_MaxTextureUnits 4\n"
-"uniform vec4 _gl4es_TextureEnvColor[_gl4es_MaxTextureUnits];\n";
+"uniform highp vec4 _gl4es_TextureEnvColor[_gl4es_MaxTextureUnits];\n";
 
 static const char* gl4es_texgeneyeSource[4] = {
 "#define _gl4es_MaxTextureCoords 8\n"
-"uniform vec4 _gl4es_EyePlaneS[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_EyePlaneT[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_EyePlaneR[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_EyePlaneQ[_gl4es_MaxTextureCoords];\n" };
+"uniform highp vec4 _gl4es_EyePlaneS[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_EyePlaneT[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_EyePlaneR[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_EyePlaneQ[_gl4es_MaxTextureCoords];\n" };
 
 static const char* gl4es_texgenobjSource[4] = {
 "#define _gl4es_MaxTextureCoords 8\n"
-"uniform vec4 _gl4es_ObjectPlaneS[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_ObjectPlaneT[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_ObjectPlaneR[_gl4es_MaxTextureCoords];\n",
-"uniform vec4 _gl4es_ObjectPlaneQ[_gl4es_MaxTextureCoords];\n" };
+"uniform highp vec4 _gl4es_ObjectPlaneS[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_ObjectPlaneT[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_ObjectPlaneR[_gl4es_MaxTextureCoords];\n",
+"uniform highp vec4 _gl4es_ObjectPlaneQ[_gl4es_MaxTextureCoords];\n" };
 
 static const char* gl4es_clipplanesSource =
 "#define _gl4es_MaxClipPlanes 6\n"
-"uniform vec4 _gl4es_ClipPlane[_gl4es_MaxClipPlanes];\n";
+"uniform highp vec4 _gl4es_ClipPlane[_gl4es_MaxClipPlanes];\n";
 
 static const char* gl4es_normalscaleSource =
-"uniform float _gl4es_NormalScale;\n";
+"uniform highp float _gl4es_NormalScale;\n";
 
 static const char* gl4es_instanceID =
 "#define GL_ARB_draw_instanced 1\n"
@@ -251,10 +251,10 @@ static const char* gl4es_backColorSource =
 "varying highp vec4 _gl4es_BackColor;\n";
 
 static const char* gl4es_frontSecondaryColorSource =
-"varying highp vec4 _gl4es_FrontSecondaryColor;\n";
+"highp vec4 _gl4es_FrontSecondaryColor;\n";
 
 static const char* gl4es_backSecondaryColorSource =
-"varying highp vec4 _gl4es_BackSecondaryColor;\n";
+"highp vec4 _gl4es_BackSecondaryColor;\n";
 
 static const char* gl4es_texcoordSource =
 "varying highp vec4 _gl4es_TexCoord[%d];\n";
@@ -576,6 +576,24 @@ Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
 Tmp = gl4es_inplace_replace(Tmp,&tmpsize,
     "sampler2DShadow",
     "sampler2D");
+
+Tmp = gl4es_inplace_replace(
+    Tmp,
+    &tmpsize,
+    "shadow2DProj",
+    "shadow2D");
+
+Tmp = gl4es_inplace_replace(
+    Tmp,
+    &tmpsize,
+    "shadow2DEXT",
+    "shadow2D");
+
+Tmp = gl4es_inplace_replace(
+    Tmp,
+    &tmpsize,
+    "shadow2DProjEXT",
+    "shadow2D");
 
 /*
 const char* ShadowFallback =
@@ -905,7 +923,7 @@ else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') 
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_BackSecondaryColor", "_gl4es_BackSecondaryColor");
   }
 
-#if 0
+
   if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
     need->need_fogcoord = 1;
     nvarying+=1;
@@ -913,11 +931,11 @@ else if ((*newptr==' ') || (*newptr==0x0d) || (*newptr==0x0a) || (*newptr=='-') 
     headline+=gl4es_countline(gl4es_fogcoordSource);
     Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "gl_FogFragCoord", "_gl4es_FogFragCoord");
   }
-#endif
+
 
 
 // strip fog
-
+/*
 if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
 
     need->need_fogcoord = 0;
@@ -936,7 +954,7 @@ if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
         &tmpsize
     );
 }
-
+*/
 
   // Get the max_texunit and the calc notexarray
   if(strstr(Tmp, "gl_TexCoord") || need->need_texcoord!=-1) {
@@ -1057,7 +1075,7 @@ if(strstr(Tmp, "gl_FogFragCoord") || need->need_fogcoord) {
               Tmp = gl4es_inplace_replace(Tmp, &tmpsize, builtin_matrix[i].glname, builtin_matrix[i].name);
               // insert a declaration of it
               char def[100];
-              int ishighp = (isVertex || hardext.highp)?1:0;
+              int ishighp = 1;
               if(builtin_matrix[i].matrix == MAT_N) {
                 if(need->need_normalmatrix && !hardext.highp)
                   ishighp = 0;
@@ -1440,6 +1458,18 @@ if(gl4es_find_string(Tmp, "uniform vec4 pc")) {
         Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "uniform vec4 pc", "uniform highp vec4 pc");
     }
 
+
+if(gl4es_find_string(Tmp, "uniform vec4 vc")) {
+        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "uniform vec4 vc", "uniform highp vec4 vc");
+    }
+
+if(gl4es_find_string(Tmp, "uniform vec4 vcbones")) {
+        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "uniform vec4 vcbones", "uniform highp vec4 vcbones");
+    }
+
+if(gl4es_find_string(Tmp, "uniform vec4 vcscreen")) {
+        Tmp = gl4es_inplace_replace(Tmp, &tmpsize, "uniform vec4 vcscreen", "uniform highp vec4 vcscreen");
+    }
 
 
 #if 0
